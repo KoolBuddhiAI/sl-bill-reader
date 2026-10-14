@@ -1,0 +1,2 @@
+Co./Last Name	First Name	Purchase #	Date	Supplier Invoice #	Inclusive	Memo	Description	Account #	Amount	Inc-Tax Amount	Job	Tax Code	Non-GST/Non-VAT Amount	Tax Amount	Import Duty Amount	Purchase Status
+Samsuddin Siddiqui			28/10/2024	287	X	Samsuddin Siddiqui 287 | Orig INR 7,226.00 @ 0.28	Samsuddin Siddiqui 287 | Orig INR 7,226.00 @ 0.28	6-2310	2023.28	2023.28		N-T		0.00		B

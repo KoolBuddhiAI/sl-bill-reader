@@ -1,0 +1,2 @@
+Cheque Account	Cheque #	Date	Inclusive	Co./Last Name	First Name	Payee	Memo	Allocation Account #	Amount	Job	Tax Code	Non-GST/Non-VAT Amount	Tax Amount	Import Duty Amount	Allocation Memo
+1-1110	T-10001	04/01/2026	X	Vat Company (Pvt) Ltd		Vat Company (Pvt) Ltd	Vat Company (Pvt) Ltd T-10001	5-1000	2719900.00		VAT		414900.00		Vat Company (Pvt) Ltd T-10001

@@ -54,7 +54,7 @@ All tests run offline using recorded LLM fixtures. Live accuracy is compared acr
   - Depends: T1
   - Notes: FR-1–FR-6. SHA-256 dedupe. Allowed types. Store originals under `data/documents/<sha>/`. pypdfium2 at 200 DPI, EXIF transpose, resize long edge to 2000 px, pillow-heif. Inbox watcher waits until size has been stable for 2 s, then moves the file to `processed/` or `failed/`. Ingest takes an `enqueue` callback so it stays decoupled from the worker.
 
-- [ ] `T4` — Vision & OCR+text extractors, fallback chain, validation & confidence
+- [~] `T4` — Vision & OCR+text extractors, fallback chain, validation & confidence
   - Files: `bill_reader/extract/{base,vision,ocr_text,prompts,orchestrator}.py`, `bill_reader/validate.py`, `tests/test_extract.py`, `tests/test_validate.py`, `tests/fixtures/llm/<profile>/*.json`
   - Estimate: large
   - Depends: T1, T11
@@ -66,7 +66,7 @@ All tests run offline using recorded LLM fixtures. Live accuracy is compared acr
     - Validation applies the FR-12 rules and confidence factors.
     - Record fixtures per profile by running once against the samples (gated by `RECORD_FIXTURES=1` and the available keys: GLM and DeepSeek). Tests replay them.
 
-- [ ] `T5` — Categoriser
+- [~] `T5` — Categoriser
   - Files: `bill_reader/categorise.py`, `tests/test_categorise.py`, `tests/fixtures/llm/<profile>/categorise_*.json`
   - Estimate: medium
   - Depends: T1, T11, T2
@@ -76,7 +76,7 @@ All tests run offline using recorded LLM fixtures. Live accuracy is compared acr
     - Supplier history hit gives confidence 0.95. Otherwise a structured call to the **categorisation profile** (a text-only model is fine; default `deepseek-text`); if the returned code is not in the chart, retry once, then pick `6-9999 Suspense/Uncategorised` at confidence 0.
     - Tax code rule: `VAT` when vat_amount > 0, else `N-T`.
 
-- [~] `T6` — MYOB import file export
+- [x] `T6` — MYOB import file export
   - Files: `bill_reader/export/{base,myob_file}.py`, `tests/test_export_myob.py`, `tests/fixtures/export/*.txt`
   - Estimate: medium
   - Depends: T1, T2

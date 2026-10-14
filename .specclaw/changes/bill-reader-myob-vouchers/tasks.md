@@ -28,7 +28,7 @@ All tests run offline using recorded LLM fixtures. Live accuracy is compared acr
   - Estimate: small
   - Notes: Ground truth values from spec's Sample Set table (incl. expected account code). Sample SL SME chart: ~40 accounts in MYOB format (`1-1110 Cash at Bank`, `5-1000 Purchases`, `6-xxxx` Motor Vehicle Repairs, Repairs & Maintenance, Meals & Entertainment, Staff Welfare, Office Supplies, Utilities, Rent, Travel, etc.). Import formats: Spend Money and Service Purchases column lists per AccountRight import layout (A1). Check against MYOB's import/export field reference and comment any uncertain columns.
 
-- [~] `T11` — LLM provider layer & model profiles
+- [x] `T11` — LLM provider layer & model profiles
   - Files: `bill_reader/llm/{__init__,profiles,base,openai_compat,anthropic_client}.py`, `config/models.yaml`, `.env.example` (`ZAI_API_KEY`, `DEEPSEEK_API_KEY`, `OPENAI_API_KEY`, `ANTHROPIC_API_KEY`), `bill_reader/cli.py` (`models list`, `models check`), `tests/test_llm_*.py`
   - Estimate: medium
   - Depends: T1

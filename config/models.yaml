@@ -1,0 +1,75 @@
+# Model profiles. Switch models by changing `extraction` / `categorisation` below,
+# by setting BILL_READER_EXTRACTION_PROFILE / BILL_READER_CATEGORISATION_PROFILE,
+# or on the Settings page. API keys are read only from the env var each profile names.
+#
+# provider: openai_compatible (GLM/Z.ai, DeepSeek, OpenAI, OpenRouter, ...) | anthropic
+# supports_vision: false  -> profile is used in "ocr+text" mode (needs Surya installed)
+# structured output strategy: tools -> json_mode -> prompt-only JSON (first the profile supports)
+# price_*_per_m: USD per 1M tokens, only used for eval cost estimates (verify current pricing).
+
+extraction: glm-vision
+fallback_chain: [glm-vision, deepseek-vision, deepseek-text]
+categorisation: deepseek-text
+
+profiles:
+  glm-vision:
+    provider: openai_compatible
+    base_url: https://api.z.ai/api/paas/v4
+    model: glm-4.6v                 # docs.z.ai/guides/vlm/glm-4.6v
+    api_key_env: ZAI_API_KEY
+    supports_vision: true
+    supports_tools: true
+    supports_json_mode: false
+    extra_body: {thinking: {type: disabled}}
+    price_in_per_m: 0.30
+    price_out_per_m: 0.90
+
+  glm-vision-flash:
+    provider: openai_compatible
+    base_url: https://api.z.ai/api/paas/v4
+    model: glm-4.6v-flash           # free tier variant
+    api_key_env: ZAI_API_KEY
+    supports_vision: true
+    supports_tools: true
+    supports_json_mode: false
+    extra_body: {thinking: {type: disabled}}
+    price_in_per_m: 0.0
+    price_out_per_m: 0.0
+
+  deepseek-vision:
+    provider: openai_compatible
+    base_url: https://api.deepseek.com
+    model: deepseek-flash           # api-docs.deepseek.com/guides/vision
+    api_key_env: DEEPSEEK_API_KEY
+    supports_vision: true
+    supports_tools: true
+    supports_json_mode: true
+    price_in_per_m: 0.27            # verify
+    price_out_per_m: 1.10           # verify
+
+  deepseek-text:
+    provider: openai_compatible
+    base_url: https://api.deepseek.com
+    model: deepseek-chat            # text-only; used in ocr+text mode and for categorisation
+    api_key_env: DEEPSEEK_API_KEY
+    supports_vision: false
+    supports_tools: true
+    supports_json_mode: true
+    price_in_per_m: 0.27            # verify
+    price_out_per_m: 1.10           # verify
+
+  openai-vision:
+    provider: openai_compatible
+    base_url: https://api.openai.com/v1
+    model: gpt-4.1                  # set to the vision model you want to compare
+    api_key_env: OPENAI_API_KEY
+    supports_vision: true
+    supports_tools: true
+    supports_json_mode: true
+
+  claude-vision:
+    provider: anthropic
+    model: claude-opus-5-5
+    api_key_env: ANTHROPIC_API_KEY
+    supports_vision: true
+    supports_tools: true

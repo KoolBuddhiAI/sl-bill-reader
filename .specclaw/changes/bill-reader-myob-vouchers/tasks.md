@@ -133,7 +133,7 @@ All tests run offline using recorded LLM fixtures. Live accuracy is compared acr
 
 ### Wave 4 — Evaluation & demo
 
-- [~] `T10` — Multi-model eval & comparison, README, demo run
+- [x] `T10` — Multi-model eval & comparison, README, demo run
   - Files: `bill_reader/evaluate.py`, `bill_reader/cli.py` (`eval`, `import-accounts`), `README.md`, `docs/eval-results.md`
   - Estimate: medium
   - Depends: T7, T8, T9

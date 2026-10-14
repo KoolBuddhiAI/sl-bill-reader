@@ -28,7 +28,7 @@ git:
 
 # Build settings
 build:
-  test_command: ""                 # e.g., "npm test", "pytest"
+  test_command: "pytest"           # e.g., "npm test", "pytest"
   lint_command: ""                 # e.g., "npm run lint"
   build_command: ""                # e.g., "npm run build"
   parallel_tasks: 3               # Max concurrent agent spawns

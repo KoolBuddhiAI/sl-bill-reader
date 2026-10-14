@@ -1,7 +1,7 @@
 # Proposal: Multilingual Bill Reader → MYOB Vouchers
 
 **Created:** 2026-10-14
-**Status:** 🟡 Draft (revised after review)
+**Status:** ✅ Approved (2026-10-14)
 
 ## Problem
 

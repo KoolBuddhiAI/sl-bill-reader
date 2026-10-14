@@ -20,7 +20,7 @@ models:
 #   direct               — commits straight to current branch
 #   worktree-per-change  — isolated worktree per change, enables parallel multi-change builds
 git:
-  strategy: "branch-per-change"   # "branch-per-change" | "direct" | "worktree-per-change"
+  strategy: "direct"              # "branch-per-change" | "direct" | "worktree-per-change"
   auto_commit: true
   commit_prefix: "specclaw"       # Prefix for auto-commits
   branch_prefix: "specclaw/"      # Prefix for feature branches

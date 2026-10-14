@@ -18,17 +18,17 @@ All tests run offline using recorded LLM fixtures. Live accuracy is compared acr
 
 ### Wave 1 — Foundation, reference data, model layer (T1b after T1)
 
-- [ ] `T1` — Project scaffold, config, database models
+- [x] `T1` — Project scaffold, config, database models
   - Files: `pyproject.toml`, `.env.example`, `.gitignore`, `Dockerfile`, `docker-compose.yml`, `bill_reader/{__init__,config,db,models,schemas,app,cli}.py`, `tests/conftest.py`
   - Estimate: medium
   - Notes: Settings per design (thresholds, paths, home currency LKR, default bank `1-1110`). SQLModel tables from design's Data Model; Decimal stored as TEXT. Pydantic `BillExtraction` schema (FR-7/8) — also the tool/JSON schema sent to the model. App factory creates DB on startup. `bill-reader serve` CLI. Set `build.test_command: pytest` in `.specclaw/config.yaml`.
 
-- [ ] `T2` — Sample ground truth, chart of accounts, tax codes, MYOB import formats
+- [~] `T2` — Sample ground truth, chart of accounts, tax codes, MYOB import formats
   - Files: `samples/ground_truth/0{1..5}-*.json`, `config/chart_of_accounts.sample.csv`, `config/tax_codes.yaml`, `config/myob_import_formats.yaml`
   - Estimate: small
   - Notes: Ground truth values from spec's Sample Set table (incl. expected account code). Sample SL SME chart: ~40 accounts in MYOB format (`1-1110 Cash at Bank`, `5-1000 Purchases`, `6-xxxx` Motor Vehicle Repairs, Repairs & Maintenance, Meals & Entertainment, Staff Welfare, Office Supplies, Utilities, Rent, Travel, etc.). Import formats: Spend Money and Service Purchases column lists per AccountRight import layout (A1). Check against MYOB's import/export field reference and comment any uncertain columns.
 
-- [ ] `T1b` — LLM provider layer & model profiles
+- [ ] `T11` — LLM provider layer & model profiles
   - Files: `bill_reader/llm/{__init__,profiles,base,openai_compat,anthropic_client}.py`, `config/models.yaml`, `.env.example` (`ZAI_API_KEY`, `DEEPSEEK_API_KEY`, `OPENAI_API_KEY`, `ANTHROPIC_API_KEY`), `bill_reader/cli.py` (`models list`, `models check`), `tests/test_llm_*.py`
   - Estimate: medium
   - Depends: T1
@@ -57,7 +57,7 @@ All tests run offline using recorded LLM fixtures. Live accuracy is compared acr
 - [ ] `T4` — Vision & OCR+text extractors, fallback chain, validation & confidence
   - Files: `bill_reader/extract/{base,vision,ocr_text,prompts,orchestrator}.py`, `bill_reader/validate.py`, `tests/test_extract.py`, `tests/test_validate.py`, `tests/fixtures/llm/<profile>/*.json`
   - Estimate: large
-  - Depends: T1, T1b
+  - Depends: T1, T11
   - Notes:
     - FR-7–FR-12, FR-10b. Model-agnostic: the extractors take a `ModelProfile` and call `LLMClient`. The orchestrator walks `fallback_chain` and records profile, model, mode, latency and tokens on the bill.
     - The prompt covers the LK/IN context and pitfalls: cash tendered/change/"you saved" are not the total; list vs discounted columns; lakh grouping; dd/mm dates; original script plus English translation; approximate normalised boxes; per-field confidence; `not_a_bill`; multi-document warning.
@@ -69,7 +69,7 @@ All tests run offline using recorded LLM fixtures. Live accuracy is compared acr
 - [ ] `T5` — Categoriser
   - Files: `bill_reader/categorise.py`, `tests/test_categorise.py`, `tests/fixtures/llm/<profile>/categorise_*.json`
   - Estimate: medium
-  - Depends: T1, T1b, T2
+  - Depends: T1, T11, T2
   - Notes:
     - FR-13–FR-15. Load and replace the chart from CSV, keeping detail expense/COGS/asset accounts only.
     - Supplier-name normaliser: lowercase, strip `(pvt) ltd`, punctuation and whitespace; prefer the English name.

@@ -23,12 +23,12 @@ All tests run offline using recorded LLM fixtures. Live accuracy is compared acr
   - Estimate: medium
   - Notes: Settings per design (thresholds, paths, home currency LKR, default bank `1-1110`). SQLModel tables from design's Data Model; Decimal stored as TEXT. Pydantic `BillExtraction` schema (FR-7/8) — also the tool/JSON schema sent to the model. App factory creates DB on startup. `bill-reader serve` CLI. Set `build.test_command: pytest` in `.specclaw/config.yaml`.
 
-- [~] `T2` — Sample ground truth, chart of accounts, tax codes, MYOB import formats
+- [x] `T2` — Sample ground truth, chart of accounts, tax codes, MYOB import formats
   - Files: `samples/ground_truth/0{1..5}-*.json`, `config/chart_of_accounts.sample.csv`, `config/tax_codes.yaml`, `config/myob_import_formats.yaml`
   - Estimate: small
   - Notes: Ground truth values from spec's Sample Set table (incl. expected account code). Sample SL SME chart: ~40 accounts in MYOB format (`1-1110 Cash at Bank`, `5-1000 Purchases`, `6-xxxx` Motor Vehicle Repairs, Repairs & Maintenance, Meals & Entertainment, Staff Welfare, Office Supplies, Utilities, Rent, Travel, etc.). Import formats: Spend Money and Service Purchases column lists per AccountRight import layout (A1). Check against MYOB's import/export field reference and comment any uncertain columns.
 
-- [ ] `T11` — LLM provider layer & model profiles
+- [~] `T11` — LLM provider layer & model profiles
   - Files: `bill_reader/llm/{__init__,profiles,base,openai_compat,anthropic_client}.py`, `config/models.yaml`, `.env.example` (`ZAI_API_KEY`, `DEEPSEEK_API_KEY`, `OPENAI_API_KEY`, `ANTHROPIC_API_KEY`), `bill_reader/cli.py` (`models list`, `models check`), `tests/test_llm_*.py`
   - Estimate: medium
   - Depends: T1
@@ -48,7 +48,7 @@ All tests run offline using recorded LLM fixtures. Live accuracy is compared acr
 
 ### Wave 2 — Pipeline components (parallel)
 
-- [ ] `T3` — Ingestion, watched folder, pre-processing
+- [~] `T3` — Ingestion, watched folder, pre-processing
   - Files: `bill_reader/{ingest,watcher,preprocess}.py`, `tests/test_ingest.py`, `tests/test_preprocess.py`
   - Estimate: medium
   - Depends: T1

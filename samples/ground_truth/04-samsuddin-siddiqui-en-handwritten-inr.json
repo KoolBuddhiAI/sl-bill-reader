@@ -1,0 +1,81 @@
+{
+  "file": "04-samsuddin-siddiqui-en-handwritten-inr.png",
+  "supplier_name": "Samsuddin Siddiqui",
+  "supplier_aliases": [
+    "SS",
+    "Samsuddin"
+  ],
+  "supplier_tax_id": "DODPS7841F",
+  "bill_number": "287",
+  "bill_date": "2024-10-28",
+  "currency": "INR",
+  "subtotal": "7226.00",
+  "discount": null,
+  "vat_amount": null,
+  "vat_rate": null,
+  "sscl_amount": null,
+  "total": "7226.00",
+  "languages": [
+    "en"
+  ],
+  "doc_type": "invoice",
+  "line_items": [
+    {
+      "description": "Flush tank push button",
+      "qty": "1",
+      "unit_price": "240.00",
+      "amount": "240.00"
+    },
+    {
+      "description": "2nd exp. brash",
+      "qty": "1",
+      "unit_price": "550.00",
+      "amount": "550.00"
+    },
+    {
+      "description": "Bathroom commode English new fitting",
+      "qty": "2",
+      "unit_price": "230.00",
+      "amount": "460.00"
+    },
+    {
+      "description": "Pressure nut ... (partly illegible)",
+      "qty": "2",
+      "unit_price": "450.00",
+      "amount": "900.00"
+    },
+    {
+      "description": "Pipe 2nd exp. and pressure pipe",
+      "qty": "2",
+      "unit_price": "195.00",
+      "amount": "390.00"
+    },
+    {
+      "description": "Plumber charge",
+      "qty": null,
+      "unit_price": "2300.00",
+      "amount": "2300.00"
+    },
+    {
+      "description": "Pato bolt new",
+      "qty": "1",
+      "unit_price": "836.00",
+      "amount": "836.00"
+    },
+    {
+      "description": "Hydraulics ...",
+      "qty": "1",
+      "unit_price": "750.00",
+      "amount": "750.00"
+    },
+    {
+      "description": "Labour charge",
+      "qty": null,
+      "unit_price": "800.00",
+      "amount": "800.00"
+    }
+  ],
+  "expected_account_code": "6-2310",
+  "expected_tax_code": "N-T",
+  "notes": "Supplier tax id is an Indian PAN (DODPS7841F), not a VAT/GST number. Address Ghatkopar (W), Mumbai 400086. Billed to BVC Logistics Pvt Ltd, Andheri (E), Mumbai. Total in words: Seven thousand two hundred twenty-six. Currency INR (Rs.) inferred from Indian address; requires exchange rate. Some handwritten descriptions are approximate."
+}

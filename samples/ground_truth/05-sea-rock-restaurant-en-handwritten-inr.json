@@ -1,0 +1,57 @@
+{
+  "file": "05-sea-rock-restaurant-en-handwritten-inr.png",
+  "supplier_name": "Sea Rock Restaurant",
+  "supplier_aliases": [
+    "Sea Rock",
+    "Sea Rock Restaurant Mahabalipuram"
+  ],
+  "supplier_tax_id": null,
+  "bill_number": "4931",
+  "bill_date": "2016-01-27",
+  "currency": "INR",
+  "subtotal": "340.00",
+  "discount": null,
+  "vat_amount": null,
+  "vat_rate": null,
+  "sscl_amount": null,
+  "total": "340.00",
+  "languages": [
+    "en"
+  ],
+  "doc_type": "cash_bill",
+  "line_items": [
+    {
+      "description": "B.K. coffee B.pot (handwritten, approximate)",
+      "qty": "1",
+      "unit_price": "80.00",
+      "amount": "80.00"
+    },
+    {
+      "description": "Milk ... (handwritten, illegible)",
+      "qty": "1",
+      "unit_price": "50.00",
+      "amount": "50.00"
+    },
+    {
+      "description": "Omelette toast",
+      "qty": "1",
+      "unit_price": "70.00",
+      "amount": "70.00"
+    },
+    {
+      "description": "Fried eggs",
+      "qty": "1",
+      "unit_price": "70.00",
+      "amount": "70.00"
+    },
+    {
+      "description": "S. egg toast",
+      "qty": "1",
+      "unit_price": "70.00",
+      "amount": "70.00"
+    }
+  ],
+  "expected_account_code": "6-3110",
+  "expected_tax_code": "N-T",
+  "notes": "Cash bill, G.K.M. Street, Fisherman Colony, Mahabalipuram 603104, Tamil Nadu; proprietor P. Sankar. Date handwritten '27/1/2016' read as dd/mm (2016-01-27). Total 340 written twice ('Rs 340' and in TOTAL box). Currency INR inferred from Indian address; requires exchange rate."
+}

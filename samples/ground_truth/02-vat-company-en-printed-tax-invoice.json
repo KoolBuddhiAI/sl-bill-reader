@@ -1,0 +1,87 @@
+{
+  "file": "02-vat-company-en-printed-tax-invoice.png",
+  "supplier_name": "Vat Company (Pvt) Ltd",
+  "supplier_aliases": [
+    "Vat Company",
+    "Vat Company Pvt Ltd"
+  ],
+  "supplier_tax_id": "11C011096",
+  "bill_number": "T-10001",
+  "bill_date": "2026-01-04",
+  "currency": "LKR",
+  "subtotal": "2305000.00",
+  "discount": null,
+  "vat_amount": "414900.00",
+  "vat_rate": "18",
+  "sscl_amount": null,
+  "total": "2719900.00",
+  "languages": [
+    "en"
+  ],
+  "doc_type": "tax_invoice",
+  "line_items": [
+    {
+      "description": "SAMPLE ITEM 1",
+      "qty": "1.00",
+      "unit_price": "120000.00",
+      "amount": "120000.00"
+    },
+    {
+      "description": "SAMPLE ITEM 2",
+      "qty": "2.00",
+      "unit_price": "50000.00",
+      "amount": "100000.00"
+    },
+    {
+      "description": "SAMPLE ITEM 3",
+      "qty": "1.00",
+      "unit_price": "160000.00",
+      "amount": "160000.00"
+    },
+    {
+      "description": "SAMPLE ITEM 4",
+      "qty": "1.00",
+      "unit_price": "80000.00",
+      "amount": "80000.00"
+    },
+    {
+      "description": "SAMPLE ITEM 5",
+      "qty": "1.00",
+      "unit_price": "155000.00",
+      "amount": "155000.00"
+    },
+    {
+      "description": "SAMPLE ITEM 6",
+      "qty": "1.00",
+      "unit_price": "110000.00",
+      "amount": "110000.00"
+    },
+    {
+      "description": "SAMPLE ITEM 7",
+      "qty": "2.00",
+      "unit_price": "90000.00",
+      "amount": "180000.00"
+    },
+    {
+      "description": "SAMPLE ITEM 8",
+      "qty": "3.00",
+      "unit_price": "100000.00",
+      "amount": "300000.00"
+    },
+    {
+      "description": "SAMPLE ITEM 9",
+      "qty": "2.00",
+      "unit_price": "200000.00",
+      "amount": "400000.00"
+    },
+    {
+      "description": "SAMPLE ITEM 10",
+      "qty": "5.00",
+      "unit_price": "140000.00",
+      "amount": "700000.00"
+    }
+  ],
+  "expected_account_code": "5-1000",
+  "expected_tax_code": "VAT",
+  "notes": "Supplier address Colombo; purchaser ABC (Pvt) Ltd, TIN 114638250, Kandy. Printed subtotal is malformed '2,30,5000.00' (= 2,305,000.00); VAT '4,14,900.00' and total '27,19,900.00' use lakh grouping. Mode of payment: Bank Transfer. Date printed 04-01-2026 (dd-mm-yyyy)."
+}

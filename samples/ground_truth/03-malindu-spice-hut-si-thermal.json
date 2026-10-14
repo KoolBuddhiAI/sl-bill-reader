@@ -1,0 +1,40 @@
+{
+  "file": "03-malindu-spice-hut-si-thermal.png",
+  "supplier_name": "Malindu Spice Hut",
+  "supplier_aliases": [
+    "Malindu",
+    "Malindu Spice Hut Bombuwala"
+  ],
+  "supplier_tax_id": null,
+  "bill_number": "1000013",
+  "bill_date": "2026-08-13",
+  "currency": "LKR",
+  "subtotal": "510.00",
+  "discount": null,
+  "vat_amount": null,
+  "vat_rate": null,
+  "sscl_amount": null,
+  "total": "510.00",
+  "languages": [
+    "si",
+    "en"
+  ],
+  "doc_type": "receipt",
+  "line_items": [
+    {
+      "description": "Noodles 400 g (Sinhala, brand partly illegible)",
+      "qty": "1",
+      "unit_price": "170.00",
+      "amount": "170.00"
+    },
+    {
+      "description": "Red raw rice (රතු කැකුළු සහල්)",
+      "qty": "2",
+      "unit_price": "170.00",
+      "amount": "340.00"
+    }
+  ],
+  "expected_account_code": "6-3110",
+  "expected_tax_code": "N-T",
+  "notes": "Thermal POS receipt, Mankada, Bombuwala; time 4:06:12PM; payment Cash. Total payable 510.00. Do NOT use cash tendered 1,000.00, change 490.00, market-price total 720.00 or 'you saved' 210.00. Line columns: qty, market price, our price, saving, value. Items are groceries; expected code follows the spec (Meals & Entertainment)."
+}

@@ -1,0 +1,66 @@
+{
+  "file": "01-saman-motors-si-handwritten.jpg",
+  "supplier_name": "Saman Motors",
+  "supplier_aliases": [
+    "සමන් මෝටර්ස්",
+    "Saman Motors & Service Center",
+    "SMSC",
+    "Saman Motors Monaragala"
+  ],
+  "supplier_tax_id": null,
+  "bill_number": "8502",
+  "bill_date": null,
+  "currency": "LKR",
+  "subtotal": "44800.00",
+  "discount": null,
+  "vat_amount": null,
+  "vat_rate": null,
+  "sscl_amount": null,
+  "total": "44800.00",
+  "languages": [
+    "si",
+    "en"
+  ],
+  "doc_type": "invoice",
+  "line_items": [
+    {
+      "description": "Oil (Sinhala, handwritten)",
+      "qty": "1",
+      "unit_price": "765.00",
+      "amount": "750.00"
+    },
+    {
+      "description": "Spare part, 5% discount (Sinhala, partly illegible)",
+      "qty": "1",
+      "unit_price": "29300.00",
+      "amount": "27800.00"
+    },
+    {
+      "description": "Service charge (Sinhala, handwritten)",
+      "qty": null,
+      "unit_price": "7500.00",
+      "amount": "7500.00"
+    },
+    {
+      "description": "Item (Sinhala, illegible)",
+      "qty": "1",
+      "unit_price": "4465.00",
+      "amount": "4250.00"
+    },
+    {
+      "description": "Item (Sinhala, illegible, bracketed note)",
+      "qty": "1",
+      "unit_price": "3500.00",
+      "amount": "3500.00"
+    },
+    {
+      "description": "Body wash",
+      "qty": null,
+      "unit_price": "1000.00",
+      "amount": "1000.00"
+    }
+  ],
+  "expected_account_code": "6-2410",
+  "expected_tax_code": "N-T",
+  "notes": "Hero motorcycle dealer, Wellawaya Road, Monaragala. Two price columns: 'unit' column holds list prices (765, 29300, 7500, 4465, 3500, 1000; totalled 46,530 at bottom) and the amount column holds discounted amounts (totalled 44,800). Line unit_price = list price, amount = discounted amount; qty columns are per handwritten '01'. Payable total 44,800 (also circled on page). Subtotal recorded as 44,800 so sum(lines) = subtotal = total; the implicit discount vs list is 1,730. Date handwritten '26/9/6' is ambiguous (probably 2026-09-06) so left null. 'BC2-8052' is the vehicle registration, not the bill number (printed serial 8502). Line descriptions are best-effort English readings of handwritten Sinhala."
+}

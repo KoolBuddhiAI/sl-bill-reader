@@ -1,0 +1,63 @@
+# MYOB AccountRight tab-delimited import layouts (assumption A1: AccountRight
+# desktop 2019+, File > Import Data). Each voucher type lists its columns in
+# output order. A column takes its value from either:
+#   source: <field path provided by the exporter>
+#   const:  <fixed string>
+# Available sources: paying_account, bill_number, bill_date, supplier_name,
+# memo, account_code, amount_inc_tax, amount_ex_tax, tax_code, vat_amount,
+# description, inclusive ("X" when amounts are tax inclusive).
+#
+# Header names follow MYOB's import/export field reference. Field names vary
+# slightly by region and version (e.g. "GST" vs "Tax"); columns marked
+# "# verify against AccountRight version" should be checked during the AC-12
+# manual import test. Unknown/unused trailing columns may be omitted: MYOB
+# lets you map or skip columns in the import wizard.
+#
+# File conventions (applied by the exporter): tab-delimited, CRLF line endings,
+# one header row, blank line between records, amounts with 2 dp and no
+# thousands separators.
+
+spend_money:
+  file_name: SpendMoney.txt
+  date_format: "%d/%m/%Y"
+  columns:
+    - {header: "Cheque Account", source: paying_account}
+    - {header: "Cheque #", source: bill_number}
+    - {header: "Date", source: bill_date}
+    - {header: "Inclusive", source: inclusive}
+    - {header: "Co./Last Name", source: supplier_name}
+    - {header: "First Name", const: ""}
+    - {header: "Payee", source: supplier_name}            # verify against AccountRight version (payee address line 1)
+    - {header: "Memo", source: memo}
+    - {header: "Allocation Account #", source: account_code}
+    - {header: "Amount", source: amount_inc_tax}          # tax-inclusive because Inclusive = X
+    - {header: "Job", const: ""}
+    - {header: "Tax Code", source: tax_code}
+    - {header: "Non-GST/Non-VAT Amount", const: ""}       # verify against AccountRight version (AU: "Non-GST Amount")
+    - {header: "Tax Amount", source: vat_amount}          # verify against AccountRight version (AU: "GST Amount")
+    - {header: "Import Duty Amount", const: ""}           # verify against AccountRight version
+    - {header: "Allocation Memo", source: description}    # verify against AccountRight version
+
+purchase_service:
+  # MYOB service-purchase exports carry both "Amount" (ex-tax) and "Inc-Tax Amount";
+  # on import the Inclusive flag decides which one is used. verify against AccountRight version
+  file_name: Purchases.txt
+  date_format: "%d/%m/%Y"
+  columns:
+    - {header: "Co./Last Name", source: supplier_name}
+    - {header: "First Name", const: ""}
+    - {header: "Purchase #", const: ""}                   # blank = MYOB assigns next number
+    - {header: "Date", source: bill_date}
+    - {header: "Supplier Invoice #", source: bill_number}
+    - {header: "Inclusive", source: inclusive}
+    - {header: "Memo", source: memo}
+    - {header: "Description", source: description}
+    - {header: "Account #", source: account_code}
+    - {header: "Amount", source: amount_ex_tax}           # verify against AccountRight version (some versions use "Ex-Tax Amount")
+    - {header: "Inc-Tax Amount", source: amount_inc_tax}  # verify against AccountRight version
+    - {header: "Job", const: ""}
+    - {header: "Tax Code", source: tax_code}
+    - {header: "Non-GST/Non-VAT Amount", const: ""}       # verify against AccountRight version
+    - {header: "Tax Amount", source: vat_amount}          # verify against AccountRight version (AU: "GST Amount")
+    - {header: "Import Duty Amount", const: ""}           # verify against AccountRight version
+    - {header: "Purchase Status", const: "B"}             # B = Bill (open); verify against AccountRight version

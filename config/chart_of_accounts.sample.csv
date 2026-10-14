@@ -1,0 +1,64 @@
+Account Number,Account Name,Account Type,Header/Detail
+1-0000,Assets,Asset,H
+1-1000,Current Assets,Asset,H
+1-1100,Cash & Bank,Asset,H
+1-1110,Cash at Bank,Asset,D
+1-1120,Petty Cash,Asset,D
+1-1200,Trade Debtors,Asset,D
+1-1300,Inventory,Asset,D
+1-1400,Prepayments,Asset,D
+1-1510,VAT Input Tax Receivable,Asset,D
+1-1520,WHT Receivable,Asset,D
+1-2000,Non-Current Assets,Asset,H
+1-2110,Furniture & Fittings,Asset,D
+1-2120,Office Equipment,Asset,D
+1-2130,Computer Equipment,Asset,D
+1-2140,Motor Vehicles,Asset,D
+1-2190,Accumulated Depreciation,Asset,D
+2-0000,Liabilities,Liability,H
+2-1000,Current Liabilities,Liability,H
+2-1110,Trade Creditors,Liability,D
+2-1310,VAT Payable,Liability,D
+2-1330,SSCL Payable,Liability,D
+2-1410,EPF Payable,Liability,D
+2-1420,ETF Payable,Liability,D
+2-1430,PAYE / APIT Payable,Liability,D
+2-1500,Accrued Expenses,Liability,D
+3-0000,Equity,Equity,H
+3-1000,Owner's Capital,Equity,D
+3-8000,Retained Earnings,Equity,D
+3-9000,Current Year Earnings,Equity,D
+4-0000,Income,Income,H
+4-1000,Sales,Income,D
+4-2000,Service Income,Income,D
+5-0000,Cost of Sales,Cost of Sales,H
+5-1000,Purchases,Cost of Sales,D
+5-2000,Freight & Cartage Inwards,Cost of Sales,D
+6-0000,Expenses,Expense,H
+6-1000,Staff Costs,Expense,H
+6-1110,Salaries & Wages,Expense,D
+6-1120,EPF & ETF Contributions,Expense,D
+6-1130,Staff Welfare,Expense,D
+6-2000,Premises & Vehicles,Expense,H
+6-2110,Rent,Expense,D
+6-2210,Electricity & Water,Expense,D
+6-2220,Telephone & Internet,Expense,D
+6-2310,Repairs & Maintenance,Expense,D
+6-2410,Motor Vehicle Repairs & Maintenance,Expense,D
+6-2420,Fuel,Expense,D
+6-3000,Administration,Expense,H
+6-3110,Meals & Entertainment,Expense,D
+6-3210,Travel & Accommodation,Expense,D
+6-3310,Office Supplies & Stationery,Expense,D
+6-3410,Postage & Courier,Expense,D
+6-3510,Professional Fees,Expense,D
+6-3610,Bank Charges,Expense,D
+6-3710,Insurance,Expense,D
+6-3810,Advertising & Marketing,Expense,D
+6-3910,Depreciation,Expense,D
+6-9999,Suspense / Uncategorised,Expense,D
+8-0000,Other Income,Other Income,H
+8-1000,Interest Income,Other Income,D
+9-0000,Other Expenses,Other Expense,H
+9-1000,Interest Expense,Other Expense,D
+9-2000,Exchange Loss / (Gain),Other Expense,D

@@ -1,0 +1,20 @@
+# Tax codes used for categorisation and MYOB export (assumptions A4/A5).
+# Codes must match the tax codes set up in the MYOB company file.
+home_currency: LKR
+
+tax_codes:
+  - code: VAT
+    description: Value Added Tax 18%
+    rate: 18
+    type: vat            # recoverable input tax, reported separately on the voucher
+    linked_account: 1-1510   # VAT Input Tax Receivable
+  - code: SSL
+    description: Social Security Contribution Levy 2.5%
+    rate: 2.5
+    type: sscl           # non-recoverable; folded into the expense amount (A5)
+    linked_account: 2-1330   # SSCL Payable
+  - code: N-T
+    description: Not reportable / no tax
+    rate: 0
+    type: none
+    linked_account: null

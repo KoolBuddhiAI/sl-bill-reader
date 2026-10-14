@@ -1,12 +1,12 @@
 # 🦞 SpecClaw Dashboard
 
 **Project:** sl-bill-reader
-**Last Updated:** 2026-10-14 17:53 UTC
+**Last Updated:** 2026-10-14 18:15 UTC
 
 ## Active Changes
 
 
-- 🔨 **bill-reader-myob-vouchers** — 0/12 tasks (0%) | 0 failed
+- 🔨 **bill-reader-myob-vouchers** — 11/12 tasks (91%) | 0 failed
 
 ## Pending Proposals
 

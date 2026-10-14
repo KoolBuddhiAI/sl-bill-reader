@@ -107,7 +107,7 @@ All tests run offline using recorded LLM fixtures. Live accuracy is compared acr
     - Export endpoint calls `MyobFileSink`.
     - API tests use a fake extractor.
 
-- [~] `T8` — Review UI
+- [x] `T8` — Review UI
   - Files: `bill_reader/web.py`, `bill_reader/templates/{base,bills_list,bill_review,export,settings}.html`, `bill_reader/static/{review.js,app.css}`
   - Estimate: large
   - Depends: T7

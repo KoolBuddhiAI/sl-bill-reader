@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}Settings{% endblock %}
+{% block page %}settings{% endblock %}
+{% block content %}
+<h1>Settings</h1>
+
+<section class="card">
+  <h2>Model profiles</h2>
+  <div class="row gap">
+    <label>Extraction profile <select id="extraction-select"></select></label>
+    <label>Categorisation profile <select id="categorisation-select"></select></label>
+    <button id="models-save" class="btn primary">Save</button>
+    <span id="models-msg" class="msg"></span>
+  </div>
+  <p class="muted">Fallback chain: <span id="fallback-chain">–</span></p>
+  <table class="table">
+    <thead><tr><th>Name</th><th>Provider</th><th>Model</th><th>Mode</th><th>API key</th><th>Role</th></tr></thead>
+    <tbody id="profiles-body"><tr><td colspan="6" class="muted">Loading…</td></tr></tbody>
+  </table>
+</section>
+
+<section class="card">
+  <h2>Chart of accounts</h2>
+  <p class="muted">Import a MYOB AccountRight accounts export (CSV). It replaces the current chart.</p>
+  <form id="accounts-form" class="row gap">
+    <input type="file" id="accounts-file" accept=".csv,text/csv" required>
+    <button class="btn primary">Import</button>
+    <span id="accounts-msg" class="msg"></span>
+  </form>
+</section>
+
+<section class="card">
+  <h2>OCR fallback</h2>
+  <p>Surya OCR: <span id="ocr-status" class="muted">checking…</span></p>
+</section>
+{% endblock %}

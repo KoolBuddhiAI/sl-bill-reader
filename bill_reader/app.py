@@ -53,6 +53,13 @@ def create_app(settings: Settings | None = None, *, worker_threads: int | None =
 
     app.include_router(api_router)
 
+    from fastapi.staticfiles import StaticFiles
+
+    from bill_reader.web import STATIC_DIR, router as web_router
+
+    app.include_router(web_router)
+    app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
+
     @app.get("/healthz")
     def healthz() -> dict:
         return {"status": "ok", "version": __version__, "ocr": pipeline.ocr.name if pipeline.ocr else None}

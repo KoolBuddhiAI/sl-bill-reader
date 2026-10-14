@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}Export{% endblock %}
+{% block page %}export{% endblock %}
+{% block content %}
+<h1>Export to MYOB</h1>
+<section class="card">
+  <p><span id="approved-count" class="big">–</span> approved bill(s) ready to export.</p>
+  <p class="muted">Creates MYOB AccountRight import files (Spend Money / Purchases), downloaded as a .zip. Exported bills are marked <em>exported</em>.</p>
+  <button id="export-btn" class="btn primary">Export approved bills</button>
+  <span id="export-msg" class="msg"></span>
+</section>
+
+<h2>Export history</h2>
+<table class="table">
+  <thead><tr><th>Batch</th><th>Created</th><th class="num">Bills</th><th>File</th></tr></thead>
+  <tbody id="batches-body"><tr><td colspan="4" class="muted">Loading…</td></tr></tbody>
+</table>
+{% endblock %}

@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}Bills{% endblock %}
+{% block page %}bills{% endblock %}
+{% block content %}
+<h1>Bills</h1>
+<section id="dropzone" class="dropzone" tabindex="0">
+  <p><strong>Drop bills here</strong> or <label class="link">choose files<input id="file-input" type="file" multiple
+     accept=".pdf,.jpg,.jpeg,.png,.tif,.tiff,.heic,.heif,.webp,application/pdf,image/*" hidden></label></p>
+  <p class="muted">PDF, JPG, PNG, TIFF, HEIC, WEBP</p>
+</section>
+<ul id="upload-results" class="upload-results"></ul>
+
+<div class="toolbar">
+  <label>Status
+    <select id="status-filter">
+      <option value="">All</option>
+      {% for s in statuses %}<option value="{{ s }}">{{ s.replace('_', ' ') }}</option>{% endfor %}
+    </select>
+  </label>
+  <span id="refresh-note" class="muted"></span>
+</div>
+
+<table class="table" id="bills-table">
+  <thead>
+    <tr><th></th><th>Supplier</th><th>Date</th><th class="num">Total</th><th>Confidence</th><th>Status</th><th>Model</th><th>File</th></tr>
+  </thead>
+  <tbody id="bills-body"><tr><td colspan="8" class="muted">Loading…</td></tr></tbody>
+</table>
+{% endblock %}

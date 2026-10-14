@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+{% block title %}Review #{{ bill.id }}{% endblock %}
+{% block page %}review{% endblock %}
+{% block main_class %}review-layout{% endblock %}
+{% block content %}
+<section class="viewer-pane" id="viewer-pane" data-bill-id="{{ bill.id }}">
+  <div class="viewer-toolbar">
+    <div class="page-tabs" id="page-tabs"></div>
+    <div class="zoom-controls">
+      <button type="button" class="btn small" id="zoom-out" title="Zoom out">−</button>
+      <span id="zoom-level" class="muted">100%</span>
+      <button type="button" class="btn small" id="zoom-in" title="Zoom in">+</button>
+      <button type="button" class="btn small" id="zoom-fit" title="Fit to window">Fit</button>
+    </div>
+  </div>
+  <div class="viewer" id="viewer">
+    <div class="stage" id="stage">
+      <img id="page-img" alt="Bill page" draggable="false">
+      <svg id="overlay" class="overlay" viewBox="0 0 1 1" preserveAspectRatio="none">
+        <rect id="highlight" class="highlight" x="0" y="0" width="0" height="0" visibility="hidden"></rect>
+      </svg>
+    </div>
+  </div>
+  <p class="muted hint">Drag to pan · scroll to move · Ctrl+scroll to zoom</p>
+</section>
+
+<section class="form-pane">
+  <div class="review-head">
+    <div>
+      <h1>Bill #{{ bill.id }} <span id="status-badge" class="status"></span></h1>
+      <div class="muted" id="filename">{{ bill.original_filename }}</div>
+    </div>
+    <a href="/" class="link">← All bills</a>
+  </div>
+
+  <div id="processing-banner" class="banner info" hidden>Extracting… this page refreshes automatically.</div>
+  <div id="error-banner" class="banner error" hidden></div>
+  <div id="warnings-banner" class="banner warn" hidden></div>
+  <p id="extraction-info" class="muted extraction-info"></p>
+
+  <form id="review-form" autocomplete="off">
+    <fieldset id="form-fields">
+      <h2>Bill details</h2>
+      <div id="fields" class="fields-grid"></div>
+
+      <div class="legend muted">
+        <span class="swatch level-high"></span> high
+        <span class="swatch level-medium"></span> medium
+        <span class="swatch level-low"></span> low
+        <span class="swatch level-confirmed"></span> confirmed / edited
+      </div>
+
+      <h2>Line items</h2>
+      <table class="table items" id="items-table">
+        <thead><tr><th>Description</th><th class="num">Qty</th><th class="num">Unit price</th><th class="num">Amount</th><th></th></tr></thead>
+        <tbody id="items-body"></tbody>
+      </table>
+      <button type="button" class="btn small" id="add-item">+ Add line</button>
+
+      <h2>Coding</h2>
+      <div class="coding">
+        <div class="field account-field" id="account-wrap">
+          <label for="account-input">Account</label>
+          <div class="combo">
+            <input id="account-input" type="text" placeholder="Search code or name…">
+            <ul id="account-results" class="combo-list" hidden></ul>
+          </div>
+          <div id="account-suggestion" class="muted small-text"></div>
+        </div>
+        <div class="field">
+          <label for="tax-code">Tax code</label>
+          <select id="tax-code">
+            <option value="VAT">VAT – VAT 18%</option>
+            <option value="SSL">SSL – SSCL 2.5%</option>
+            <option value="N-T">N-T – no tax</option>
+          </select>
+        </div>
+        <div class="field">
+          <span class="label">Voucher type</span>
+          <div class="segmented" role="radiogroup">
+            <label><input type="radio" name="voucher_type" value="spend_money" checked><span>Spend Money</span></label>
+            <label><input type="radio" name="voucher_type" value="purchase"><span>Purchase Bill</span></label>
+          </div>
+        </div>
+        <div class="field" id="paying-wrap">
+          <label for="paying-account">Paying account</label>
+          <input id="paying-account" type="text">
+        </div>
+        <div class="field" id="rate-wrap" hidden>
+          <label for="exchange-rate" id="rate-label">Exchange rate</label>
+          <input id="exchange-rate" type="text" inputmode="decimal" placeholder="e.g. 3.45">
+        </div>
+      </div>
+    </fieldset>
+
+    <div class="actions">
+      <button type="button" class="btn" id="save-btn">Save</button>
+      <button type="button" class="btn primary" id="approve-btn">Approve</button>
+      <span class="spacer"></span>
+      <select id="reextract-profile" title="Model profile"></select>
+      <button type="button" class="btn" id="reextract-btn">Re-extract</button>
+      <button type="button" class="btn danger" id="delete-btn">Delete</button>
+    </div>
+    <span id="action-msg" class="msg"></span>
+    <div id="problems-banner" class="banner error" hidden></div>
+  </form>
+
+  <details class="audit" id="audit">
+    <summary>Audit log</summary>
+    <ol id="audit-list"></ol>
+  </details>
+</section>
+{% endblock %}
+{% block scripts %}<script src="{{ url_for('static', path='review.js') }}"></script>{% endblock %}

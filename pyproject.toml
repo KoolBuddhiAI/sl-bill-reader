@@ -26,7 +26,7 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-surya = ["surya-ocr>=0.6"]
+surya = ["surya-ocr>=0.22,<0.23"]
 dev = ["pytest>=8"]
 
 [project.scripts]

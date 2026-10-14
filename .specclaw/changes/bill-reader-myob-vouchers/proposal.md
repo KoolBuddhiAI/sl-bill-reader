@@ -21,6 +21,7 @@ Commodity OCR tools (Tesseract, most cloud OCR) handle printed English well. The
 | 6 | Coding | **One account code per bill** (line-splitting deferred) |
 | 7 | Sample docs | None yet — start with a synthetic/sample set we create |
 | 8 | SSO / deployment | Not in the initial version — runs locally (single user) |
+| 9 | AI model | **Provider-agnostic, chosen in config.** Available keys today: **GLM (Z.ai)** and **DeepSeek**; OpenAI/Anthropic/Gemini can be added. Accuracy is compared per model on the sample set before choosing a default. |
 
 **Iteration 1 goal:** *demonstrate capability* — read the invoice, propose an account code, let the user review/correct, and **export a file that MYOB AccountRight can import**. Direct API posting is **iteration 2**.
 
@@ -36,7 +37,7 @@ Commodity OCR tools (Tesseract, most cloud OCR) handle printed English well. The
 1. **Ingest** — drag-and-drop upload in a local web UI, plus a watched folder for scanner output. PDF (text + scanned) and JPG/PNG/HEIC/TIFF. Duplicate detection by file hash.
 2. **Pre-processing** — rasterise PDFs, use embedded text layer when present, deskew/contrast-enhance photos, handle multi-page bills.
 3. **Extraction** — pluggable `Extractor` interface:
-   - **Primary: frontier multimodal LLM** (Claude; Gemini as swappable alternative) returning **structured JSON**: supplier, invoice no., date, currency, line items, subtotal, **VAT**, **SSCL**, total — each with a per-field confidence and bounding box. Handles printed and handwritten English/Sinhala/Tamil without templates.
+   - **Primary: a configurable multimodal LLM** (GLM vision or DeepSeek vision today; OpenAI/Claude/Gemini switchable via config) returning **structured JSON**: supplier, invoice no., date, currency, line items, subtotal, **VAT**, **SSCL**, total — each with a per-field confidence and bounding box. Handles printed and handwritten English/Sinhala/Tamil without templates.
    - **Fallback: Surya-OCR** (local, best open-source printed Sinhala/Tamil OCR) — used when the frontier model fails, errors, or returns low confidence; its text layer is fed back for a second extraction pass.
    - **Confidence** = model self-confidence + arithmetic checks (lines → subtotal, subtotal + VAT + SSCL → total), date validity, VAT-number format.
 4. **Categorisation** — propose **one account code + tax code per bill**, using: the chart of accounts **imported from an MYOB export file** (no API in iter 1), supplier history (last code used for that supplier), and LLM classification of the item descriptions as fallback. Shows confidence + a one-line reason.

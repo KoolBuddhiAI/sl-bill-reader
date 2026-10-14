@@ -6,7 +6,7 @@
 
 ## Overview
 
-A local, single-user web app that ingests bills/invoices (printed, thermal, handwritten; PDF or image; English, Sinhala, Tamil), extracts the voucher fields with a frontier multimodal model (Surya-OCR as fallback), proposes **one MYOB account code + tax code per bill**, lets the user review and correct the values against the original image with per-field confidence, and exports approved bills as **MYOB AccountRight import files** (Spend Money by default, Purchase Bill optional). Direct MYOB API posting is iteration 2 and is **not** part of this spec.
+A local, single-user web app that ingests bills/invoices (printed, thermal, handwritten; PDF or image; English, Sinhala, Tamil), extracts the voucher fields with a **configurable LLM** (GLM / DeepSeek today; OpenAI / Claude switchable; Surya-OCR as fallback and for text-only models), proposes **one MYOB account code + tax code per bill**, lets the user review and correct the values against the original image with per-field confidence, and exports approved bills as **MYOB AccountRight import files** (Spend Money by default, Purchase Bill optional). Direct MYOB API posting is iteration 2 and is **not** part of this spec.
 
 The goal of iteration 1 is a **capability demo** on the five sample bills supplied (see *Sample Set*).
 
@@ -22,7 +22,8 @@ The goal of iteration 1 is a **capability demo** on the five sample bills suppli
 | A6 | Currency | Home currency LKR. Bills in another currency (e.g. INR samples 04, 05) are detected and flagged; the user enters an exchange rate and the exported amount is LKR, with the original currency/amount written into the memo. |
 | A7 | Coding granularity | One account code per bill (no line splitting). Line items are extracted for display and categorisation only. |
 | A8 | Users / deployment | One user on one machine; no login. Started with `docker compose up` or `uvicorn`. |
-| A9 | AI provider | Anthropic API (Claude) via API key in `.env`; model name configurable. Images may be sent to the cloud (approved). |
+| A9 | AI provider | **Provider-agnostic.** Models are named profiles in `config/models.yaml` (provider, base URL, model id, API-key env var, capabilities). Active profiles for *extraction* and *categorisation* are selected in config/UI. Initial profiles: **GLM vision (Z.ai)** and **DeepSeek** (keys available); OpenAI, Anthropic, Gemini profiles shipped but disabled until a key is set. Images may be sent to the cloud (approved). |
+| A10 | Vision support | A model may be vision-capable or text-only. Vision profiles read the image directly. Text-only profiles are used in **OCR + LLM** mode: Surya-OCR text (with line boxes) is passed to the model. Profile capability flags decide the mode; the capability is checked at startup with a probe call (`bill-reader models check`). |
 
 ## Sample Set
 
@@ -56,8 +57,12 @@ Stored in `samples/bills/` with ground truth in `samples/ground_truth/*.json`.
 - **FR-7** Extract a structured `BillExtraction`: supplier name, supplier address, supplier tax ID (TIN/VAT no.), bill/invoice number, bill date (ISO), currency (ISO 4217), detected language(s), document type (tax invoice / invoice / receipt / cash bill), line items (description, original-script description, qty, unit price, amount), subtotal, discount, VAT amount + rate, SSCL amount, total, payment method if shown.
 - **FR-8** Each top-level field carries a confidence (0–1) and an optional normalised bounding box (`[x0,y0,x1,y1]`, 0–1, page index).
 - **FR-9** Descriptions in Sinhala/Tamil are returned both as read (original script) and translated to English.
-- **FR-10** Primary extractor is a frontier multimodal model (Claude) using a strict JSON schema / tool-call output.
-- **FR-11** Fallback: if the primary extractor errors, times out, returns invalid JSON after one retry, or overall confidence < configurable threshold (default 0.5), run **Surya-OCR** locally and re-run extraction with the OCR text supplied as additional context (or, if the primary model is unavailable, produce a best-effort text-only extraction). The extractor used is recorded on the bill.
+- **FR-10** The extractor uses the **configured extraction model profile**. Structured output uses the best mechanism the profile supports: function/tool calling with the `BillExtraction` schema, else JSON mode, else prompt-only JSON. In all cases the output is validated with Pydantic and retried once with the validation error.
+- **FR-10a** Model profiles live in `config/models.yaml`; API keys are read only from the env var the profile names. Supported provider adapters: `openai_compatible` (GLM/Z.ai, DeepSeek, OpenAI, and any OpenAI-compatible gateway) and `anthropic`. Adding a model needs config only, not code.
+- **FR-10b** Vision profiles get page images. Text-only profiles get Surya OCR text in reading order with line ids, and return line ids instead of boxes; boxes come from the OCR lines.
+- **FR-10c** Each bill records the extraction profile, model id, mode (`vision` / `ocr+text`), latency and token usage. The review page shows them.
+- **FR-10d** The settings page lists profiles with status (key present, vision probe OK) and lets the user switch the active extraction and categorisation profiles. "Re-extract with…" on the review page re-runs one bill with a different profile.
+- **FR-11** Fallback chain (ordered list of profiles in config, e.g. `[glm-vision, deepseek-vision, deepseek-text+surya]`): if the primary extractor errors, times out, returns invalid JSON after one retry, or overall confidence < configurable threshold (default 0.5), run **Surya-OCR** locally and re-run extraction with the OCR text supplied as additional context (or, if the primary model is unavailable, produce a best-effort text-only extraction). The extractor used is recorded on the bill.
 - **FR-12** Validation checks adjust confidence and raise warnings: Σ line amounts ≈ subtotal; subtotal − discount + VAT + SSCL ≈ total (tolerance 1.00); date parseable and not in the future; VAT amount ≈ rate × taxable amount; total > 0.
 
 **Categorisation**
@@ -78,7 +83,7 @@ Stored in `samples/bills/` with ground truth in `samples/ground_truth/*.json`.
 - **FR-23** Exported bills are marked `exported` with export batch id/time and are excluded from subsequent exports unless the user explicitly re-exports a batch.
 
 **Evaluation**
-- **FR-24** A CLI `bill-reader eval samples/` runs the pipeline on the sample set and reports per-field accuracy against ground truth (supplier, bill no., date, total, currency, account code) and extractor used.
+- **FR-24** A CLI `bill-reader eval samples/ --models glm-vision,deepseek-vision,...` runs the pipeline on the sample set once per profile. It reports per-field accuracy against ground truth (supplier, bill no., date, total, VAT, currency, account code), per-sample results, mean latency and token usage/estimated cost per profile, as a **side-by-side comparison table**. Output: `docs/eval-results.md` + `data/eval/<timestamp>.json`.
 
 ### Non-Functional Requirements
 
@@ -95,15 +100,18 @@ Stored in `samples/bills/` with ground truth in `samples/ground_truth/*.json`.
 - [ ] **AC-1** Uploading all five sample files via the UI produces five bills that reach `needs_review` (or `failed` with a visible reason); re-uploading any of them is rejected as duplicate.
 - [ ] **AC-2** Dropping a sample file into the watched inbox folder creates a bill within 10 s of the file being written, and the file is moved to `processed/`.
 - [ ] **AC-3** A single-page PDF made from sample 02 is processed identically to the PNG (same total/VAT).
-- [ ] **AC-4** On the live eval (`bill-reader eval samples/`), **total** is correct on ≥4/5 samples and **supplier name** recognisably correct on ≥4/5; sample 03 total is 510.00 (not 1,000.00 / 490.00 / 210.00).
+- [ ] **AC-4** On the live eval with **at least one configured profile** (`bill-reader eval samples/`), **total** is correct on ≥4/5 samples and **supplier name** recognisably correct on ≥4/5; sample 03 total is 510.00 (not 1,000.00 / 490.00 / 210.00).
 - [ ] **AC-5** Sample 02 extraction: subtotal 2,305,000.00, VAT 414,900.00 @ 18%, total 2,719,900.00, tax code `VAT`, no arithmetic warning.
 - [ ] **AC-6** Samples 04 and 05 are detected as `INR`; the review page requires an exchange rate before approval; the export amount equals total × rate rounded to 2 dp and the memo contains the original INR amount.
 - [ ] **AC-7** Every extracted field shows a confidence colour; at least the total field on sample 02 highlights a box on the image when hovered.
 - [ ] **AC-8** Proposed account codes on the live eval match the expected category for ≥4/5 samples (01 vehicle repairs, 02 purchases/cost of sales, 03 & 05 meals, 04 repairs & maintenance).
 - [ ] **AC-9** After approving a bill from supplier X with code C, a new bill from supplier X is proposed code C with reason "previously used for this supplier".
-- [ ] **AC-10** With the primary extractor forced to fail (invalid API key / test flag) and Surya installed, a sample is still extracted via `surya` and the bill shows "Extracted with: Surya fallback". Without Surya installed, the bill goes to `failed` with a clear message.
+- [ ] **AC-10** With the primary profile forced to fail (invalid API key / test flag) and Surya installed, a sample is still extracted via `surya` and the bill shows "Extracted with: Surya fallback". Without Surya installed, the bill goes to `failed` with a clear message.
 - [ ] **AC-11** Export of approved samples produces Spend Money and Purchase files whose columns match `config/myob_import_formats.yaml`, tab-delimited, one voucher per record, amounts with 2 dp; a second export without new approvals produces nothing; exported bills show `exported`.
 - [ ] **AC-12** The generated Spend Money file imports into an AccountRight sample company file without errors *(manual check — requires MYOB; recorded in verify-report)*.
+- [ ] **AC-14** Switching the extraction profile in `config/models.yaml` (or the settings page) from GLM to DeepSeek requires no code change; the next processed bill records the new profile/model id.
+- [ ] **AC-15** `bill-reader eval samples/ --models <a>,<b>` produces a comparison table covering every requested profile that has a key. Profiles without a key are listed as "skipped – no API key".
+- [ ] **AC-16** A text-only profile (e.g. DeepSeek text) extracts via `ocr+text` mode when Surya is installed and is marked as such on the bill.
 - [ ] **AC-13** `pytest` passes offline; corrections are persisted (original vs corrected visible in the bill's audit log).
 
 ## Edge Cases
@@ -123,8 +131,11 @@ Stored in `samples/bills/` with ground truth in `samples/ground_truth/*.json`.
 
 ## Dependencies
 
-- Anthropic API key (Claude) — primary extractor and categoriser.
-- Python 3.11+, FastAPI, Uvicorn, SQLModel/SQLite, Pydantic v2, Jinja2, `pypdfium2`, Pillow + `pillow-heif`, `watchdog`, `anthropic` SDK.
+- At least one LLM API key: **GLM (Z.ai)** and/or **DeepSeek** (available now); OpenAI/Anthropic/Gemini optional for comparison.
+- Model ids and endpoints (to verify during build, from provider docs):
+  - GLM: base URL `https://api.z.ai/api/paas/v4`; vision model `glm-4.6v` (or the newest GLM-V) and the cheaper `glm-4.6v-flash`.
+  - DeepSeek: base URL `https://api.deepseek.com`; image input reportedly available since Aug–Sep 2026 on the V4.x Flash line (`deepseek-flash`). The older `deepseek-chat` is text-only and is used in `ocr+text` mode.
+- Python 3.11+, FastAPI, Uvicorn, SQLModel/SQLite, Pydantic v2, Jinja2, `pypdfium2`, Pillow + `pillow-heif`, `watchdog`, `openai` SDK (OpenAI-compatible client), `anthropic` SDK (optional), PyYAML.
 - Optional: `surya-ocr` (+ PyTorch CPU) for fallback.
 - MYOB AccountRight desktop with a test company file for AC-12 (manual).
 

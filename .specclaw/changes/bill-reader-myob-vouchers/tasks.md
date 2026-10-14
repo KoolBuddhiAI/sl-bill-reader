@@ -90,7 +90,7 @@ All tests run offline using recorded LLM fixtures. Live accuracy is compared acr
 
 ### Wave 3 — Orchestration, UI, fallback
 
-- [ ] `T7` — Worker pipeline & JSON API
+- [x] `T7` — Worker pipeline & JSON API
   - Files: `bill_reader/{worker,api}.py`, `bill_reader/app.py` (wire startup), `tests/test_api.py`, `tests/test_worker.py`
   - Estimate: medium
   - Depends: T3, T4, T5, T6
@@ -121,7 +121,7 @@ All tests run offline using recorded LLM fixtures. Live accuracy is compared acr
     - Fonts: Noto Sans Sinhala and Noto Sans Tamil from Google Fonts.
     - Smoke test with Playwright (Chromium is pre-installed): upload sample 02, approve, export.
 
-- [ ] `T9` — Surya-OCR engine & heuristic last-resort extractor
+- [~] `T9` — Surya-OCR engine & heuristic last-resort extractor
   - Files: `bill_reader/ocr/{__init__,surya}.py`, `bill_reader/extract/heuristic.py`, `pyproject.toml` (`[surya]` extra), `tests/test_ocr_surya.py`
   - Estimate: medium
   - Depends: T4

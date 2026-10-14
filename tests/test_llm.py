@@ -136,3 +136,14 @@ def test_anthropic_forced_tool():
     assert seen[0]["tool_choice"] == {"type": "tool", "name": "submit_result"}
     assert seen[0]["messages"][0]["content"][0]["source"]["media_type"] == "image/png"
 
+
+
+def test_settings_page_selection_persists(settings):
+    from bill_reader.llm.profiles import save_active_profiles
+
+    save_active_profiles(settings, "deepseek-vision", None)
+    cfg = load_models_config(settings)
+    assert cfg.extraction == "deepseek-vision" and cfg.categorisation == "deepseek-text"
+    with pytest.raises(KeyError):
+        save_active_profiles(settings, "nope", None)
+    assert load_models_config(settings).extraction == "deepseek-vision"

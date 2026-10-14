@@ -54,7 +54,7 @@ All tests run offline using recorded LLM fixtures. Live accuracy is compared acr
   - Depends: T1
   - Notes: FR-1–FR-6. SHA-256 dedupe. Allowed types. Store originals under `data/documents/<sha>/`. pypdfium2 at 200 DPI, EXIF transpose, resize long edge to 2000 px, pillow-heif. Inbox watcher waits until size has been stable for 2 s, then moves the file to `processed/` or `failed/`. Ingest takes an `enqueue` callback so it stays decoupled from the worker.
 
-- [~] `T4` — Vision & OCR+text extractors, fallback chain, validation & confidence
+- [x] `T4` — Vision & OCR+text extractors, fallback chain, validation & confidence
   - Files: `bill_reader/extract/{base,vision,ocr_text,prompts,orchestrator}.py`, `bill_reader/validate.py`, `tests/test_extract.py`, `tests/test_validate.py`, `tests/fixtures/llm/<profile>/*.json`
   - Estimate: large
   - Depends: T1, T11

@@ -1,0 +1,31 @@
+{
+  "doc_type": "tax_invoice",
+  "languages": ["en"],
+  "document_count": 1,
+  "supplier_name": {"value": "Vat Company (Pvt) Ltd", "confidence": 0.97, "bbox": [0.25, 0.06, 0.55, 0.08], "page": 0},
+  "supplier_address": {"value": "Colombo", "confidence": 0.9},
+  "supplier_tax_id": {"value": "11C011096", "confidence": 0.95},
+  "bill_number": {"value": "T-10001", "confidence": 0.96},
+  "bill_date": {"value": "04-01-2026", "confidence": 0.93},
+  "currency": {"value": "LKR", "confidence": 0.8},
+  "subtotal": {"value": "2,30,5000.00", "confidence": 0.85},
+  "discount": {"value": null, "confidence": 0},
+  "vat_amount": {"value": "4,14,900.00", "confidence": 0.92},
+  "vat_rate": {"value": "18", "confidence": 0.95},
+  "sscl_amount": {"value": null, "confidence": 0},
+  "total": {"value": "27,19,900.00", "confidence": 0.95, "bbox": [0.75, 0.73, 0.97, 0.75], "page": 0},
+  "payment_method": {"value": "Bank Transfer", "confidence": 0.9},
+  "line_items": [
+    {"description": "SAMPLE ITEM 1", "qty": "1.00", "unit_price": "120,000.00", "amount": "120,000.00", "confidence": 0.95},
+    {"description": "SAMPLE ITEM 2", "qty": "2.00", "unit_price": "50,000.00", "amount": "100,000.00", "confidence": 0.95},
+    {"description": "SAMPLE ITEM 3", "qty": "1.00", "unit_price": "160,000.00", "amount": "160,000.00", "confidence": 0.95},
+    {"description": "SAMPLE ITEM 4", "qty": "1.00", "unit_price": "80,000.00", "amount": "80,000.00", "confidence": 0.95},
+    {"description": "SAMPLE ITEM 5", "qty": "1.00", "unit_price": "155,000.00", "amount": "155,000.00", "confidence": 0.95},
+    {"description": "SAMPLE ITEM 6", "qty": "1.00", "unit_price": "110,000.00", "amount": "110,000.00", "confidence": 0.95},
+    {"description": "SAMPLE ITEM 7", "qty": "2.00", "unit_price": "90,000.00", "amount": "180,000.00", "confidence": 0.95},
+    {"description": "SAMPLE ITEM 8", "qty": "3.00", "unit_price": "100,000.00", "amount": "300,000.00", "confidence": 0.95},
+    {"description": "SAMPLE ITEM 9", "qty": "2.00", "unit_price": "200,000.00", "amount": "400,000.00", "confidence": 0.95},
+    {"description": "SAMPLE ITEM 10", "qty": "5.00", "unit_price": "140,000.00", "amount": "700,000.00", "confidence": 0.95}
+  ],
+  "notes": "Total value of supply printed with misplaced separators (2,30,5000.00)."
+}

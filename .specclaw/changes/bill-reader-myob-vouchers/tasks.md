@@ -48,7 +48,7 @@ All tests run offline using recorded LLM fixtures. Live accuracy is compared acr
 
 ### Wave 2 — Pipeline components (parallel)
 
-- [~] `T3` — Ingestion, watched folder, pre-processing
+- [x] `T3` — Ingestion, watched folder, pre-processing
   - Files: `bill_reader/{ingest,watcher,preprocess}.py`, `tests/test_ingest.py`, `tests/test_preprocess.py`
   - Estimate: medium
   - Depends: T1
@@ -76,7 +76,7 @@ All tests run offline using recorded LLM fixtures. Live accuracy is compared acr
     - Supplier history hit gives confidence 0.95. Otherwise a structured call to the **categorisation profile** (a text-only model is fine; default `deepseek-text`); if the returned code is not in the chart, retry once, then pick `6-9999 Suspense/Uncategorised` at confidence 0.
     - Tax code rule: `VAT` when vat_amount > 0, else `N-T`.
 
-- [ ] `T6` — MYOB import file export
+- [~] `T6` — MYOB import file export
   - Files: `bill_reader/export/{base,myob_file}.py`, `tests/test_export_myob.py`, `tests/fixtures/export/*.txt`
   - Estimate: medium
   - Depends: T1, T2

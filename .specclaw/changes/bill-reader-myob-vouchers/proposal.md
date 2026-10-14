@@ -1,7 +1,7 @@
 # Proposal: Multilingual Bill Reader → MYOB Vouchers
 
 **Created:** 2026-10-14
-**Status:** 🟡 Draft
+**Status:** 🟡 Draft (revised after review)
 
 ## Problem
 
@@ -9,71 +9,85 @@ Supplier bills and invoices come in many forms: formally printed, digital PDFs, 
 
 Commodity OCR tools (Tesseract, most cloud OCR) handle printed English well. They do badly on Sinhala and Tamil, and worst on handwriting. Published benchmarks only cover **printed** Sinhala/Tamil. Surya-OCR leads zero-shot tests, and fine-tuned LightOnOCR-2-1B leads on printed Sinhala pages. There is **no public benchmark for Sinhala/Tamil handwritten invoices**, so model choice has to be validated on our own documents.
 
+## Decisions (review 2026-10-14)
+
+| # | Question | Decision |
+|---|----------|----------|
+| 1 | MYOB product | **MYOB AccountRight on-premise** (desktop company file) |
+| 2 | Voucher type | User chooses per bill; **default = Spend Money** (Purchase Bill as option) |
+| 3 | Cloud AI | Acceptable — invoice images may be sent to a cloud AI API |
+| 4 | Volume | ~50 bills / month (cost is not a concern; no fine-tuning needed) |
+| 5 | Taxes | VAT and SSCL appear on bills and map to MYOB tax codes |
+| 6 | Coding | **One account code per bill** (line-splitting deferred) |
+| 7 | Sample docs | None yet — start with a synthetic/sample set we create |
+| 8 | SSO / deployment | Not in the initial version — runs locally (single user) |
+
+**Iteration 1 goal:** *demonstrate capability* — read the invoice, propose an account code, let the user review/correct, and **export a file that MYOB AccountRight can import**. Direct API posting is **iteration 2**.
+
 ## Proposed Solution
 
-A small web app plus background worker that turns a document into a reviewed MYOB voucher:
-
 ```
- Ingest ──► Pre-process ──► Extract ──► Categorise ──► Review UI ──► Push to MYOB
- (upload /    (PDF→image,     (VLM reads    (suggest       (preview +     (Spend Money or
-  watched      deskew, split   fields +      account code   confidence,    Purchase Bill,
-  folder)      pages)          line items)   + tax code)    user edits)    attach source)
+ Ingest ──► Pre-process ──► Extract ──► Categorise ──► Review UI ──► Export MYOB import file  (iter 1)
+ (upload /    (PDF→image,     (frontier     (one account    (preview +                          └─► MYOB API  (iter 2)
+  folder)      deskew)         VLM; Surya    code + tax      confidence,
+                               fallback)     code / bill)    edit, approve)
 ```
 
-1. **Ingest:** drag-and-drop upload in the UI, plus a **watched folder** (local or network share) for scanner output. Accepts PDF (text and scanned), JPG/PNG/HEIC/TIFF. Uses a file hash to skip duplicates.
-2. **Pre-processing:** rasterises PDFs; reads the text layer directly when one exists; deskews, crops and enhances contrast on photos; splits multi-page and multi-invoice PDFs.
-3. **Extraction (the model question):** a pluggable `Extractor` interface with a tiered strategy:
-   - **Primary: a frontier multimodal LLM** (e.g. Claude, or Gemini as an alternative) prompted for **structured JSON output**: supplier, invoice no., date, currency, line items, subtotal, tax/VAT, total. Each field gets its own confidence and a bounding box. These models currently handle handwritten Sinhala/Tamil far better than classic OCR, and they understand invoice layout without templates.
-   - **Secondary / cross-check: Surya-OCR** (best open-source zero-shot printed Sinhala/Tamil OCR). It runs locally to give a raw text layer and an independent reading of the numbers. Where the two readings disagree, confidence is lowered.
-   - **Optional later: a fine-tuned open VLM** (e.g. LightOnOCR-2 or Qwen-VL class) trained on our corrected documents, for on-prem or cheaper processing once we have enough labelled data.
-   - **Confidence score** = blend of model self-reported confidence, OCR agreement, and arithmetic checks (line items add up to the subtotal, subtotal plus tax equals the total, the date is valid, the supplier's tax number has the right format).
-4. **Categorisation:** suggests an MYOB **account code** and **tax code** per line or per bill. Inputs are the chart of accounts synced from MYOB, the supplier's history (the last code used for that supplier wins), and LLM classification of the item descriptions as a fallback. Each suggestion shows a confidence score and a short reason.
-5. **Review UI:** the original image sits side by side with an editable form. Fields are colour-coded by confidence (green/amber/red), and hovering a field highlights where it was read on the image. The user corrects values, picks the account code from a searchable list, and approves. Low-confidence bills must be reviewed; nothing posts automatically in v1. Corrections are stored as a feedback dataset for evaluation and future fine-tuning.
-6. **Push to MYOB:** OAuth 2.0 to the MYOB Business / AccountRight API (`sme-purchase`, `sme-banking` scopes). Creates a **Purchase Bill** (`/Purchase/Bill/Service`) or a **Spend Money** transaction (`/Banking/SpendMoneyTxn`), depending on the voucher type the user chooses. Matches or creates the supplier card and attaches the source document. Records the MYOB UID for traceability, and blocks duplicates using supplier + invoice no. + amount.
+1. **Ingest** — drag-and-drop upload in a local web UI, plus a watched folder for scanner output. PDF (text + scanned) and JPG/PNG/HEIC/TIFF. Duplicate detection by file hash.
+2. **Pre-processing** — rasterise PDFs, use embedded text layer when present, deskew/contrast-enhance photos, handle multi-page bills.
+3. **Extraction** — pluggable `Extractor` interface:
+   - **Primary: frontier multimodal LLM** (Claude; Gemini as swappable alternative) returning **structured JSON**: supplier, invoice no., date, currency, line items, subtotal, **VAT**, **SSCL**, total — each with a per-field confidence and bounding box. Handles printed and handwritten English/Sinhala/Tamil without templates.
+   - **Fallback: Surya-OCR** (local, best open-source printed Sinhala/Tamil OCR) — used when the frontier model fails, errors, or returns low confidence; its text layer is fed back for a second extraction pass.
+   - **Confidence** = model self-confidence + arithmetic checks (lines → subtotal, subtotal + VAT + SSCL → total), date validity, VAT-number format.
+4. **Categorisation** — propose **one account code + tax code per bill**, using: the chart of accounts **imported from an MYOB export file** (no API in iter 1), supplier history (last code used for that supplier), and LLM classification of the item descriptions as fallback. Shows confidence + a one-line reason.
+5. **Review UI** — original image beside an editable form; fields colour-coded by confidence (green/amber/red), hover highlights the source region; searchable account-code picker; voucher-type toggle (**Spend Money** default / Purchase Bill); approve. Corrections are saved (future accuracy tracking).
+6. **Export (iteration 1)** — generate MYOB AccountRight **import files** (tab-delimited text in MYOB's import format, via *File → Import Data*):
+   - Spend Money import (default), and Purchases (Service bill) import for bills flagged as Purchase Bill.
+   - Approved bills batched into one file per voucher type; bills marked as exported to prevent double-import.
+   - Exact field layout / required columns to be confirmed against the MYOB AccountRight import/export guide during `/specclaw:plan`.
+7. **MYOB API (iteration 2, planned not built)** — AccountRight on-prem exposes the API via the local AccountRight API service; post Spend Money (`/Banking/SpendMoneyTxn`) or Purchase Bill (`/Purchase/Bill/Service`) directly, sync chart of accounts and supplier cards live, store MYOB UIDs. The export step sits behind a `VoucherSink` interface so the API sink drops in alongside the file sink.
 
-**Suggested stack (to confirm in /plan):** Python (FastAPI) backend + job queue, React/Next.js review UI, PostgreSQL, object storage for documents, Docker deploy.
+**Suggested stack (confirm in /plan):** Python (FastAPI) backend with a background worker, lightweight React review UI, SQLite (single user, local), local file storage, Docker Compose for one-command start.
 
 ## Scope
 
-### In Scope
-- Upload via web UI and watched-folder ingestion
-- PDF (text and scanned) and image inputs; multi-page handling
-- Printed and handwritten English, Sinhala and Tamil (including mixed-language bills)
-- Field and line-item extraction with per-field confidence and source bounding boxes
-- Account code and tax code suggestions using the MYOB chart of accounts and supplier history
-- Review/correct/approve UI with an image preview
-- Posting to MYOB as a Purchase Bill or Spend Money, with the document attached
-- Duplicate detection, audit log (who changed what, what was posted)
-- A labelled evaluation set (~100–200 real bills across language and print/handwriting mix) and a repeatable accuracy benchmark to pick and track models
+### In Scope (iteration 1)
+- Upload via UI and watched-folder ingestion; PDF + image inputs
+- Printed and handwritten English, Sinhala, Tamil (including mixed)
+- Frontier-VLM extraction with per-field confidence; Surya-OCR fallback
+- VAT and SSCL extraction and tax-code mapping
+- One account code per bill, proposed from imported chart of accounts + supplier history + LLM
+- Review/correct/approve UI with image preview and confidence colouring
+- Voucher type per bill (Spend Money default / Purchase Bill)
+- Export of MYOB AccountRight import files; exported-status tracking
+- A small **sample document set** (synthetic + any anonymised real bills later) and a simple accuracy script
 
-### Out of Scope
-- Fine-tuning our own model (follow-up once the correction dataset exists)
-- Fully automatic posting without review
-- Payment processing, bank reconciliation, approval workflows beyond a single reviewer
-- Accounting systems other than MYOB (keep the connector interface pluggable)
-- Mobile app (mobile browser upload is enough for v1)
-- Email-inbox ingestion (candidate for v2)
+### Out of Scope (iteration 1)
+- **Direct MYOB API posting** → iteration 2
+- Splitting one bill across multiple account codes
+- SSO, multi-user, cloud deployment
+- Fine-tuning models
+- Automatic posting without review
+- Payments, reconciliation, approval workflows; non-MYOB systems; email ingestion
 
 ## Impact
 
-- **Files affected:** ~40–60 (new greenfield repo: backend, worker, UI, MYOB connector, eval harness)
-- **Complexity:** large
-- **Risk:** medium–high
-  - *Handwriting accuracy* on Sinhala/Tamil is unproven. Mitigation: build the eval set first, keep a human in the loop, use confidence gating.
-  - *Data privacy:* sending bills to a cloud LLM API. Mitigation: confirm the data policy; keep a local-only Surya path as an option.
-  - *MYOB API constraints:* only company-file admins can authorise OAuth; rate limits; supplier card matching.
-  - *Cost per document* for LLM calls (expected to be low cents per page; to be measured).
+- **Files affected:** ~30–40 (greenfield: backend, worker, UI, extractor, categoriser, MYOB export, samples)
+- **Complexity:** medium (iteration 1); large overall with iteration 2
+- **Risk:** medium
+  - *Handwritten Sinhala/Tamil accuracy* unproven — mitigated by human review, confidence gating, Surya fallback, and testing on a sample set.
+  - *No real samples yet* — synthetic samples may overstate accuracy; ask for real bills before go-live.
+  - *MYOB import format strictness* — import files fail on wrong column order/date format/account numbers; validate against a test company file.
+  - *Iteration 2:* on-prem API requires the AccountRight API service running and reachable from the app host.
 
 ## Open Questions
 
-1. **MYOB product:** MYOB Business / AccountRight (cloud) or MYOB Advanced? One company file or several?
-2. **Voucher type:** should bills post as Purchase Bills (creditor, paid later) or Spend Money (already paid), or should the user choose per bill?
-3. **Data residency:** is it acceptable to send invoice images to a cloud AI API (Anthropic/Google), or must processing stay on-prem?
-4. **Volume:** roughly how many bills per month? This drives cost and whether a fine-tuned local model is worth it.
-5. **Tax:** which Sri Lankan taxes appear (VAT, SSCL), and how do they map to MYOB tax codes?
-6. **Line-level vs bill-level coding:** split one bill across several account codes, or one code per bill?
-7. **Sample documents:** can you share 50+ real (or anonymised) bills covering the language and handwriting mix? This is needed for the model bake-off.
-8. **Deployment:** where should it run (cloud VM, office server, Azure)? How many users, and is single sign-on needed?
+1. **MYOB version** — which AccountRight version is installed (e.g. AccountRight 20xx desktop / "AccountRight Live" with local file)? Affects import format and iteration-2 API access.
+2. **Chart of accounts** — can you export the chart of accounts (and supplier card list) from MYOB so we can seed the categoriser? Otherwise we'll ship a sample Sri Lankan SME chart.
+3. **Spend Money bank account** — which MYOB bank/cash account should Spend Money vouchers be paid from by default?
+4. **Tax codes** — the exact MYOB tax code names used for VAT and SSCL (e.g. `VAT`, `SSL`), and how bills with no VAT should be coded.
+5. **Currency** — LKR only, or foreign-currency bills too?
+6. **Sample bills** — when available, even 10–20 real bills (photo/scan) would significantly improve the demo's credibility.
 
 ### References
 - [Benchmarking OCR Models for Sinhala and Tamil Document Digitization](https://www.researchgate.net/publication/391058761_Benchmarking_OCR_Models_for_Sinhala_and_Tamil_Document_Digitization)

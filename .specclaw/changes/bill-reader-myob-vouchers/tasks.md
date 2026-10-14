@@ -66,7 +66,7 @@ All tests run offline using recorded LLM fixtures. Live accuracy is compared acr
     - Validation applies the FR-12 rules and confidence factors.
     - Record fixtures per profile by running once against the samples (gated by `RECORD_FIXTURES=1` and the available keys: GLM and DeepSeek). Tests replay them.
 
-- [~] `T5` — Categoriser
+- [x] `T5` — Categoriser
   - Files: `bill_reader/categorise.py`, `tests/test_categorise.py`, `tests/fixtures/llm/<profile>/categorise_*.json`
   - Estimate: medium
   - Depends: T1, T11, T2

@@ -38,6 +38,9 @@ def _eval(args: argparse.Namespace) -> None:
     settings = get_settings()
     categorisation = args.categorisation or load_models_config(settings).categorisation
     names = [n.strip() for n in args.models.split(",")] if args.models else None
+    if names is None and not any(p.has_key for p in load_models_config(settings).profiles.values()):
+        raise SystemExit("No model profile has an API key set (e.g. ZAI_API_KEY, DEEPSEEK_API_KEY). "
+                         "Set one, or pass --models to list the profiles to try.")
     reports = evaluate(settings, Path(args.samples_dir), names, categorisation=categorisation,
                        ocr=default_ocr()[0], progress=lambda m: print(f"  … {m}", flush=True))
     json_path = write_reports(reports, categorisation, Path(args.out), settings.data_dir / "eval")

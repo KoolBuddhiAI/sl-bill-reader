@@ -17,7 +17,7 @@ CATEGORY = {"account_code": "5-1000", "confidence": 0.8, "reason": "Goods for re
 
 @pytest.fixture(autouse=True)
 def _keys(monkeypatch):
-    for var in ("ZAI_API_KEY", "DEEPSEEK_API_KEY"):
+    for var in ("ZAI_API_KEY", "DEEPSEEK_API_KEY", "OPENAI_API_KEY", "GEMINI_API_KEY"):
         monkeypatch.setenv(var, "test")
 
 

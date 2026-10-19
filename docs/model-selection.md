@@ -1,53 +1,58 @@
 # Model selection: bill extraction
 
 **Date:** 2026-10-19
-**Decision:** read bills with **`gpt-5.5`**. If it fails, fall back to **`deepseek-flash`**, then **`gpt-5.6-sol`**. Account codes come from `deepseek-chat`.
-**Confidence:** low to moderate. The comparison used 5 sample bills and one run per model (see below).
+**Decision:** read bills with **`gemini-3.8-flash`**. If it fails, fall back to **`deepseek-flash`**, then **`gpt-6-sol`**. Account codes come from `deepseek-flash` in text mode.
+**Confidence:** moderate on the shortlist and low on the exact ranking. The comparison used 5 sample bills, with 1–3 runs per model.
 
-## Results (5 sample bills, one run each)
+## Results with cost (5 sample bills)
 
-Full output: [eval-results.md](eval-results.md)
+Full output: [eval-results.md](eval-results.md). Prices are from the providers' pricing pages on 2026-10-19.
 
-| Model | Totals | Supplier | Bill no. | Dates* | Account* | Avg time / bill | Notes |
-|---|---|---|---|---|---|---|---|
-| **gpt-5.5** | **5/5** | **5/5** | **5/5** | 2/4 | 4/5 | 11 s | Best overall; tool calling works |
-| deepseek-flash | 5/5 | 3/5 † | 5/5 | 2/4 | 4/5 | 15 s | Cheapest (~$0.03 for 5 bills); supplier spelling varies between runs |
-| gpt-5.6-sol | 5/5 | 5/5 | 5/5 | 2/4 | 4/5 | 26 s | Same accuracy as gpt-5.5, but over twice as slow |
-| gpt-6-astra | 5/5 | 5/5 | 5/5 | 2/4 | 4/5 | 31 s | Same accuracy, slowest of the 5/5 group |
-| gpt-6-sol | 4/5 | 5/5 | 5/5 | 2/4 | 4/5 | 16 s | Sample 04: 7,220 instead of 7,226 |
-| gpt-6.1-sol | 4/5 | 5/5 | 5/5 | 2/4 | 3/5 | 36 s | Newest model, but slowest and missed sample 04 |
-| gpt-4.1 | 4/5 | 5/5 | 4/5 | 2/4 | 4/5 | 4 s | Older baseline |
-| gpt-5.6-terra | 4/5 | 5/5 | 4/5 | 2/4 | 4/5 | 12 s | |
-| gpt-5.6-luna | 4/5 | 5/5 | 3/5 | 2/4 | 4/5 | 17 s | |
-| gpt-5.4-mini | 4/5 | 4/5 | 4/5 | 2/4 | 3/5 | 4 s | Fast, but misses handwriting |
-| gpt-6-luna | 3/5 | 5/5 | 5/5 | 2/4 | 4/5 | 25 s | Read 44,800 as 144,800 |
+| Model | Totals | Supplier | Bill no. | Per bill | Avg time | Status / notes |
+|---|---|---|---|---|---|---|
+| **gemini-3.8-flash** | **5/5** | **5/5** | **5/5** | **~$0.008** | 17 s | Current. Price doubles on 2027-01-01 (~$0.016/bill) |
+| gemini-3.6-flash | 5/5 | 5/5 | 5/5 | ~$0.008 | 15 s | Previous generation Flash |
+| gemini-3.5-flash-lite | 5/5 | 5/5 | 4/5 | ~$0.004 | **3 s** | Cheapest and fastest 5/5 on totals |
+| deepseek-flash | 5/5 in all 3 runs | 3–5/5 | 5/5 | ~$0.008 | 15–22 s | Supplier spelling varies between runs; China-based provider |
+| gpt-6-sol | 5/5 | 5/5 | 5/5 | ~$0.029 | 19 s | One earlier run read 7,220 instead of 7,226 |
+| gpt-5.6-sol | 5/5 (2 runs) | 5/5 | 5/5 | ~$0.063 | 28 s | |
+| gemini-4-argon | 5/5 | 5/5 | 5/5 | ~$0.022 | 37 s | Price doubles on 2026-12-01; no free tier |
+| gpt-6-astra | 5/5 (2 runs) | 5/5 | 5/5 | ~$0.129 | 30 s | Most expensive |
+| gpt-5.5 | 4–5/5 | 5/5 | 4–5/5 | ~$0.058 | 11–16 s | Read 7,126 instead of 7,226 on run 2. Was the default briefly; replaced |
+| gpt-6-luna | 3–4/5 | 5/5 | 5/5 | ~$0.002 | 64 s | Cheapest, but misreads handwritten totals |
+| gpt-5.4-mini | 4/5 | 4–5/5 | 3–4/5 | ~$0.006 | 4 s | Misreads handwritten totals |
+| gemini-3.1-pro (preview) | — | — | — | — | >180 s | Timed out on 4 of 5 bills; excluded |
 
-\* Two caveats on these columns:
-- **Dates:** the handwritten dates on samples 04 and 05 are genuinely ambiguous. On sample 05, 9 of 11 models read "27/11/2016", while the ground truth says "27/1/2016". The label may be wrong, so the date column is not a useful way to tell models apart.
-- **Account:** sample 02's line items are literally "Sample Item 1–10", so Suspense (`6-9999`) is a reasonable answer. That miss affects every model equally.
+Every model scores about the same on dates (2–3/4) and account codes (3–4/5). The handwritten dates on samples 04 and 05 are genuinely ambiguous, and nearly every model reads sample 05 as 27/11/2016, so that ground-truth label may be wrong. On account codes, sample 02's items are "Sample Item 1–10", and sample 03 (groceries) can reasonably be either Purchases or Meals.
 
-† DeepSeek got 5/5 suppliers in an earlier run the same day.
+## Why gemini-3.8-flash
 
-## Why gpt-5.5
+- It is one of only two models that got every money and identity field right in its run at the lowest cost tier (~$0.008/bill). The other is gemini-3.6-flash, the previous generation.
+- It costs about 7× less than `gpt-5.5`, which also misread a handwritten total on its second run.
+- Bigger was not better. `gpt-6-astra` costs 16× more for the same score, and the `gemini-3.1-pro` preview timed out.
+- The fallbacks come from other vendors (DeepSeek, then OpenAI), so one provider's outage or rate limit doesn't stop processing.
 
-- It is the only model that got every money and identity field right (totals, supplier, bill number) while staying fast (~11 s).
-- Newer or larger models were **not** more accurate here. `gpt-6.1-sol` and `gpt-6-luna` both misread the handwritten total on sample 04, and they are 2–3× slower.
-- The fallback uses a different vendor (DeepSeek), so an OpenAI outage or rate limit doesn't stop processing.
+At ~50 bills a month, the whole chain costs well under $1 a month. Cost becomes a deciding factor only at thousands of bills a month.
 
 ## Trade-offs and when to change
 
-| Factor | gpt-5.5 | deepseek-flash |
-|---|---|---|
-| Accuracy on samples | 5/5 totals, most stable | 5/5 totals; supplier name varies |
-| Latency | ~11 s | ~15 s |
-| Cost | Not measured (prices aren't set in `config/models.yaml`). At ~50 bills/month the token use (~3.7k in / 1.1k out per bill) should cost cents to low dollars per month. | ~$0.006 per bill |
-| Data handling | Bill images go to OpenAI | Bill images go to DeepSeek (China-based provider) |
+| If… | Then |
+|---|---|
+| Speed matters more, e.g. bulk back-loading | Use `gemini-3.5-flash-lite` (3 s/bill, half the cost; one bill number missed) |
+| A cheaper option is wanted after the January 2027 price rise | `gemini-3.5-flash-lite` or `deepseek-flash` |
+| Bills must not go to a China-based provider | Remove `deepseek-vision` from the fallback chain and categorisation, and use a Gemini or OpenAI model there |
+| Gemini sends data to the free tier | **Make sure billing is enabled on the Gemini key before processing real customer invoices.** As I understand Google's terms, free-tier API content may be used to improve their products and paid-tier content is not. I'm moderately confident; check the current Gemini API terms. |
 
-- **Switch the default to DeepSeek** if OpenAI cost or data-residency terms become a concern. Its totals were just as accurate.
-- **Re-run the comparison** (`bill-reader eval samples/ --models …`) once there are 30 or more real bills, especially Tamil-script and more handwritten Sinhala ones. Five samples are too few to separate the top four models with confidence.
+## Data governance
+
+- Bill images are sent to the extraction provider: Google by default, and DeepSeek or OpenAI on fallback. The extracted text is sent to DeepSeek for account coding.
+- Retention and training policies differ by provider and tier. Confirm them against the client's data-handling requirements (assumption A9 in the spec) before go-live.
 
 ## Not tested
 
-- **GLM** (`glm-4.6v`): the Z.ai account had no credit, and the free `glm-4.6v-flash` tier was overloaded.
-- **Claude**: no `ANTHROPIC_API_KEY` was set.
-- **Tamil-script bills**: none in the sample set.
+- **GLM:** the Z.ai account had no credit.
+- **Claude:** no `ANTHROPIC_API_KEY` was set.
+- **Document-specialised OCR services** (e.g. Azure Document Intelligence, Google Document AI): none is available on the current keys, and their support for handwritten Sinhala is unverified.
+- **Tamil-script bills:** none in the sample set.
+
+Re-run `bill-reader eval samples/ --models …` once there are 30 or more real bills. Five samples can't reliably separate the top tier.

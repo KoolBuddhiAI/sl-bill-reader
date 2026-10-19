@@ -7,11 +7,11 @@
 # structured output strategy: tools -> json_mode -> prompt-only JSON (first the profile supports)
 # price_*_per_m: USD per 1M tokens, only used for eval cost estimates (verify current pricing).
 
-# Default chosen from the 11-model comparison (docs/model-selection.md, 2026-10-19):
-# gpt-5.5 read 5/5 totals, suppliers and bill numbers at ~11 s/bill. DeepSeek (also 5/5 totals)
-# is the fallback so an OpenAI outage doesn't stop processing.
-extraction: openai-gpt-5.5
-fallback_chain: [openai-gpt-5.5, deepseek-vision, openai-gpt-5.6-sol]
+# Default chosen from the 12-model comparison with costs (docs/model-selection.md, 2026-10-19):
+# gemini-3.8-flash read 5/5 totals, suppliers and bill numbers at ~$0.008/bill. Fallbacks are other
+# vendors so one provider's outage doesn't stop processing.
+extraction: gemini-3.8-flash
+fallback_chain: [gemini-3.8-flash, deepseek-vision, openai-gpt-6-sol]
 categorisation: deepseek-text
 
 profiles:
@@ -48,28 +48,32 @@ profiles:
     supports_tools: false           # thinking mode rejects forced tool_choice (400) -> use JSON mode
     supports_json_mode: true
     max_tokens: 8192                # thinking tokens count against the limit; 4096 sometimes left no answer
-    price_in_per_m: 0.27            # verify
-    price_out_per_m: 1.10           # verify
+    price_in_per_m: 0.30            # peak rate; off-peak is half (api-docs.deepseek.com, 2026-10-19)
+    price_out_per_m: 1.20
 
   deepseek-text:
     provider: openai_compatible
     base_url: https://api.deepseek.com
-    model: deepseek-chat            # text-only; used in ocr+text mode and for categorisation
+    model: deepseek-flash           # deepseek-chat was discontinued 2026-07-24; same model, used text-only
     api_key_env: DEEPSEEK_API_KEY
-    supports_vision: false
-    supports_tools: true
+    supports_vision: false          # used for categorisation and ocr+text mode
+    supports_tools: false           # thinking mode rejects forced tool_choice -> JSON mode
     supports_json_mode: true
-    price_in_per_m: 0.27            # verify
-    price_out_per_m: 1.10           # verify
+    max_tokens: 8192
+    price_in_per_m: 0.30
+    price_out_per_m: 1.20
 
   # Newer OpenAI models available on the account (listed via the models API, 2026-10-19).
   # They reject max_tokens/temperature, so they use max_completion_tokens and no temperature.
-  # Reasoning tokens count against max_tokens, hence the larger budget. Pricing not filled in.
+  # Reasoning tokens count against max_tokens, hence the larger budget.
+  # Prices: developers.openai.com/api/docs/pricing (2026-10-19), USD per 1M tokens.
   openai-gpt-6.1-sol: &openai_reasoning
     provider: openai_compatible
     base_url: https://api.openai.com/v1
     model: gpt-6.1-sol
     api_key_env: OPENAI_API_KEY
+    price_in_per_m: 2
+    price_out_per_m: 10
     supports_vision: true
     supports_tools: false           # gpt-6.x / 5.6: function tools need the Responses API -> JSON mode
     supports_json_mode: true
@@ -77,23 +81,45 @@ profiles:
     temperature: null
     max_tokens: 16000
     timeout_s: 180
-  openai-gpt-6-sol: {<<: *openai_reasoning, model: gpt-6-sol}
-  openai-gpt-6-luna: {<<: *openai_reasoning, model: gpt-6-luna}
-  openai-gpt-6-astra: {<<: *openai_reasoning, model: gpt-6-astra}
-  openai-gpt-5.6-sol: {<<: *openai_reasoning, model: gpt-5.6-sol}
-  openai-gpt-5.6-luna: {<<: *openai_reasoning, model: gpt-5.6-luna}
-  openai-gpt-5.6-terra: {<<: *openai_reasoning, model: gpt-5.6-terra}
-  openai-gpt-5.5: {<<: *openai_reasoning, model: gpt-5.5, supports_tools: true}
-  openai-gpt-5.4-mini: {<<: *openai_reasoning, model: gpt-5.4-mini, supports_tools: true}
+  openai-gpt-6-sol: {<<: *openai_reasoning, model: gpt-6-sol, price_in_per_m: 2, price_out_per_m: 10}
+  openai-gpt-6-luna: {<<: *openai_reasoning, model: gpt-6-luna, price_in_per_m: 0.1, price_out_per_m: 0.5}
+  openai-gpt-6-astra: {<<: *openai_reasoning, model: gpt-6-astra, price_in_per_m: 10, price_out_per_m: 50}
+  openai-gpt-5.6-sol: {<<: *openai_reasoning, model: gpt-5.6-sol, price_in_per_m: 4, price_out_per_m: 20}
+  openai-gpt-5.6-luna: {<<: *openai_reasoning, model: gpt-5.6-luna, price_in_per_m: 0.2, price_out_per_m: 1.2}
+  openai-gpt-5.6-terra: {<<: *openai_reasoning, model: gpt-5.6-terra, price_in_per_m: 2, price_out_per_m: 12}
+  openai-gpt-5.5: {<<: *openai_reasoning, model: gpt-5.5, price_in_per_m: 5, price_out_per_m: 30, supports_tools: true}
+  openai-gpt-5.4-mini: {<<: *openai_reasoning, model: gpt-5.4-mini, price_in_per_m: 0.75, price_out_per_m: 4.5, supports_tools: true}
 
   openai-vision:
     provider: openai_compatible
     base_url: https://api.openai.com/v1
-    model: gpt-4.1                  # older baseline; see the openai-gpt-* profiles above
+    model: gpt-4.1                  # DEPRECATED: shuts down 2027-01-14 (OpenAI suggests gpt-6-luna)
+    price_in_per_m: 2.00
+    price_out_per_m: 8.00
     api_key_env: OPENAI_API_KEY
     supports_vision: true
     supports_tools: true
     supports_json_mode: true
+
+  # Gemini via Google's OpenAI-compatible endpoint. Prices: ai.google.dev/gemini-api/docs/pricing (2026-10-19).
+  # Not added: gemini-2.5-pro (closed to new users), gemini-3.5/3.7-flash (auto-routed to newer),
+  # gemini-pro-latest (unpriced moving alias).
+  gemini-4-argon: &gemini
+    provider: openai_compatible
+    base_url: https://generativelanguage.googleapis.com/v1beta/openai/
+    model: gemini-4-argon
+    price_in_per_m: 2.00            # rises to $4 / $20 on 2026-12-01
+    price_out_per_m: 10.00
+    api_key_env: GEMINI_API_KEY
+    supports_vision: true
+    supports_tools: true
+    supports_json_mode: true
+    max_tokens: 16000               # thinking tokens count against the limit
+    timeout_s: 180
+  gemini-3.1-pro: {<<: *gemini, model: gemini-3.1-pro-preview, price_in_per_m: 2.00, price_out_per_m: 12.00}  # preview
+  gemini-3.8-flash: {<<: *gemini, model: gemini-3.8-flash, price_in_per_m: 0.75, price_out_per_m: 3.75}
+  gemini-3.6-flash: {<<: *gemini, model: gemini-3.6-flash, price_in_per_m: 0.75, price_out_per_m: 3.75}
+  gemini-3.5-flash-lite: {<<: *gemini, model: gemini-3.5-flash-lite, price_in_per_m: 0.30, price_out_per_m: 2.50}
 
   claude-vision:
     provider: anthropic

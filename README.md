@@ -34,7 +34,7 @@ Models are named **profiles** in [`config/models.yaml`](config/models.yaml). Eac
 | `glm-vision` | Z.ai `glm-4.6v` | `ZAI_API_KEY` | yes |
 | `glm-vision-flash` | Z.ai `glm-4.6v-flash` | `ZAI_API_KEY` | yes |
 | `deepseek-vision` (default) | `deepseek-flash` | `DEEPSEEK_API_KEY` | yes |
-| `deepseek-text` (categorisation) | `deepseek-chat` | `DEEPSEEK_API_KEY` | no: OCR + text mode, needs Surya |
+| `deepseek-text` (categorisation) | `deepseek-flash` (text mode) | `DEEPSEEK_API_KEY` | no: OCR + text mode, needs Surya |
 | `openai-vision` | set your model | `OPENAI_API_KEY` | yes |
 | `claude-vision` | `claude-opus-5-5` | `ANTHROPIC_API_KEY` | yes |
 

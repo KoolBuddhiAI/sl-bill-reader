@@ -103,7 +103,9 @@ def validate(ex: BillExtraction, home_currency: str = "LKR", today: date | None 
         )
         if target is not None and abs(lines_sum - target) > TOLERANCE:
             warn(f"line items add up to {_fmt(lines_sum)} but {target_name} implies {_fmt(target)}")
-            penalise(target_name)
+            # The total is derived from the subtotal, so it is just as suspect (a misread digit in a
+            # handwritten subtotal/total otherwise keeps a high-confidence total).
+            penalise(*{target_name, "total"})
 
     # --- subtotal - discount + VAT + SSCL = total ---
     if subtotal is not None and total is not None:

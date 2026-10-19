@@ -69,3 +69,17 @@ def test_parse_date_formats():
     assert parse_date("28/10/2024") == date(2024, 10, 28)
     assert parse_date("27/1/16") == date(2016, 1, 27)
     assert parse_date("26/9/6") is None
+
+
+def test_line_sum_mismatch_also_penalises_total_when_subtotal_present():
+    # Sample 04 misread: lines add up to 7130 but subtotal/total were read as 7926 with high confidence.
+    ex = BillExtraction.model_validate({
+        "supplier_name": {"value": "Samsuddin Siddiqui", "confidence": 0.98},
+        "bill_date": {"value": "2024-10-28", "confidence": 0.98},
+        "subtotal": {"value": "7926", "confidence": 0.98},
+        "total": {"value": "7926", "confidence": 0.98},
+        "line_items": [{"amount": "7000"}, {"amount": "130"}],
+    })
+    report = validate(ex, today=date(2026, 10, 19))
+    assert ex.total.confidence < 0.6 and ex.subtotal.confidence < 0.6
+    assert report.overall_confidence < 0.6

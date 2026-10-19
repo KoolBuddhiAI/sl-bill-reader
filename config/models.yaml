@@ -7,10 +7,11 @@
 # structured output strategy: tools -> json_mode -> prompt-only JSON (first the profile supports)
 # price_*_per_m: USD per 1M tokens, only used for eval cost estimates (verify current pricing).
 
-# Default chosen from docs/eval-results.md (2026-10-19): deepseek-vision read 5/5 totals on the samples,
-# gpt-4.1 4/5. glm-vision had no account credit and glm-vision-flash was overloaded, so GLM is untested.
-extraction: deepseek-vision
-fallback_chain: [deepseek-vision, openai-vision, glm-vision]
+# Default chosen from the 11-model comparison (docs/model-selection.md, 2026-10-19):
+# gpt-5.5 read 5/5 totals, suppliers and bill numbers at ~11 s/bill. DeepSeek (also 5/5 totals)
+# is the fallback so an OpenAI outage doesn't stop processing.
+extraction: openai-gpt-5.5
+fallback_chain: [openai-gpt-5.5, deepseek-vision, openai-gpt-5.6-sol]
 categorisation: deepseek-text
 
 profiles:

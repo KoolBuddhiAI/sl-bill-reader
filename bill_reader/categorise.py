@@ -103,7 +103,9 @@ Rules:
 - VAT and SSCL are handled separately; categorise the underlying purchase.
 - Typical Sri Lankan suppliers: CEB/LECO (electricity), Dialog/SLT/Mobitel (telephone & internet),
   fuel stations such as Ceypetco/Lanka IOC (fuel), restaurants/hotels (meals or travel).
-- If nothing fits, use 6-9999 with low confidence.
+- If the line items are unclear or illegible, infer the purchase from the supplier's name and trade
+  (e.g. "... Motors", a Hero/Bajaj/Honda dealer or service centre = vehicle repairs; a restaurant = meals).
+- Use 6-9999 with low confidence only when neither the supplier nor the items give a clue.
 Give a confidence between 0 and 1 and one short sentence of reasoning."""
 
 

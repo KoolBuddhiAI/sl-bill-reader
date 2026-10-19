@@ -169,6 +169,12 @@ def _run_sample(orchestrator, categoriser, doc, path: Path, truth: dict) -> Samp
     )
 
 
+def _short(error: str | None, limit: int = 140) -> str:
+    """First line of an error, trimmed so one failure doesn't swamp the markdown table."""
+    line = (error or "").strip().splitlines()[0] if error else ""
+    return line if len(line) <= limit else line[: limit - 1] + "…"
+
+
 def render_markdown(reports: list[ProfileReport], categorisation: str) -> str:
     ran = [r for r in reports if not r.skipped]
     lines = [
@@ -203,7 +209,7 @@ def render_markdown(reports: list[ProfileReport], categorisation: str) -> str:
             for r in ran:
                 s = r.samples[i]
                 mark = "✅" if s.scores.get("total") else "❌"
-                cells.append(f"{mark} {s.predicted.get('total') or s.error or '–'}")
+                cells.append(f"{mark} {s.predicted.get('total') or _short(s.error) or '–'}")
             lines.append(f"| {sample.file} | {sample.expected.get('total')} {sample.expected.get('currency') or ''} | "
                          + " | ".join(cells) + " |")
         lines += ["", "## Misses", ""]
@@ -212,7 +218,7 @@ def render_markdown(reports: list[ProfileReport], categorisation: str) -> str:
                 misses = [f"{n}: got `{s.predicted.get(n)}`, expected `{s.expected.get(n)}`"
                           for n, v in s.scores.items() if v is False]
                 if s.error:
-                    misses = [f"failed: {s.error}"]
+                    misses = [f"failed: {_short(s.error)}"]
                 if misses:
                     lines.append(f"- **{r.profile}** · {s.file}: " + "; ".join(misses))
     return "\n".join(lines) + "\n"

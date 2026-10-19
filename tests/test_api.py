@@ -8,7 +8,7 @@ import pytest
 from fastapi.testclient import TestClient
 
 from bill_reader.app import create_app
-from bill_reader.llm import LLMError
+from bill_reader.llm import LLMError, load_models_config
 from bill_reader.llm.base import FakeLLMClient
 
 FIXTURE = json.loads((Path(__file__).parent / "fixtures" / "llm" / "sample-02-extraction.json").read_text())
@@ -56,7 +56,8 @@ def test_upload_extract_review_approve_export(client, samples_dir):
     assert bill["fields"]["total"]["level"] == "high"
     assert bill["account_code"] == "5-1000" and bill["tax_code"] == "VAT"
     assert bill["voucher_type"] == "spend_money" and bill["paying_account"] == "1-1110"
-    assert bill["extraction"]["profile"] == "glm-vision" and bill["extraction"]["mode"] == "vision"
+    default_profile = load_models_config(client.app.state.settings).extraction
+    assert bill["extraction"]["profile"] == default_profile and bill["extraction"]["mode"] == "vision"
     assert client.get(f"/api/bills/{bill_id}/pages/0").headers["content-type"] == "image/jpeg"
 
     # correct a value; audit keeps original vs corrected

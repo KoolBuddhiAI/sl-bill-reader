@@ -7,8 +7,10 @@
 # structured output strategy: tools -> json_mode -> prompt-only JSON (first the profile supports)
 # price_*_per_m: USD per 1M tokens, only used for eval cost estimates (verify current pricing).
 
-extraction: glm-vision
-fallback_chain: [glm-vision, deepseek-vision, deepseek-text]
+# Default chosen from docs/eval-results.md (2026-10-19): deepseek-vision read 5/5 totals on the samples,
+# gpt-4.1 4/5. glm-vision had no account credit and glm-vision-flash was overloaded, so GLM is untested.
+extraction: deepseek-vision
+fallback_chain: [deepseek-vision, openai-vision, glm-vision]
 categorisation: deepseek-text
 
 profiles:
@@ -18,8 +20,8 @@ profiles:
     model: glm-4.6v                 # docs.z.ai/guides/vlm/glm-4.6v
     api_key_env: ZAI_API_KEY
     supports_vision: true
-    supports_tools: true
-    supports_json_mode: false
+    supports_tools: false           # tool calls returned stringified objects for the nested schema -> JSON mode
+    supports_json_mode: true
     extra_body: {thinking: {type: disabled}}
     price_in_per_m: 0.30
     price_out_per_m: 0.90
@@ -30,8 +32,8 @@ profiles:
     model: glm-4.6v-flash           # free tier variant
     api_key_env: ZAI_API_KEY
     supports_vision: true
-    supports_tools: true
-    supports_json_mode: false
+    supports_tools: false           # tool calls returned stringified objects for the nested schema -> JSON mode
+    supports_json_mode: true
     extra_body: {thinking: {type: disabled}}
     price_in_per_m: 0.0
     price_out_per_m: 0.0
@@ -42,8 +44,9 @@ profiles:
     model: deepseek-flash           # api-docs.deepseek.com/guides/vision
     api_key_env: DEEPSEEK_API_KEY
     supports_vision: true
-    supports_tools: true
+    supports_tools: false           # thinking mode rejects forced tool_choice (400) -> use JSON mode
     supports_json_mode: true
+    max_tokens: 8192                # thinking tokens count against the limit; 4096 sometimes left no answer
     price_in_per_m: 0.27            # verify
     price_out_per_m: 1.10           # verify
 

@@ -3,6 +3,7 @@
 from functools import lru_cache
 from pathlib import Path
 
+from dotenv import load_dotenv
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -50,4 +51,7 @@ class Settings(BaseSettings):
 
 @lru_cache
 def get_settings() -> Settings:
+    # Model profiles read their API keys (ZAI_API_KEY, DEEPSEEK_API_KEY, ...) from os.environ,
+    # so export `.env` into the process environment; real environment variables still win.
+    load_dotenv(".env", override=False)
     return Settings()

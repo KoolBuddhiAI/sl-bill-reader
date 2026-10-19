@@ -147,3 +147,11 @@ def test_settings_page_selection_persists(settings):
     with pytest.raises(KeyError):
         save_active_profiles(settings, "nope", None)
     assert load_models_config(settings).extraction == "deepseek-vision"
+
+
+def test_openai_compat_reasoning_model_params():
+    seen: list = []
+    p = profile(supports_tools=False, supports_json_mode=True, token_param="max_completion_tokens", temperature=None)
+    client = _openai_client(p, {"content": '{"total": "1"}'}, seen)
+    client.complete_structured("s", "u", Out)
+    assert "max_completion_tokens" in seen[0] and "max_tokens" not in seen[0] and "temperature" not in seen[0]

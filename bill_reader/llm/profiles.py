@@ -23,6 +23,9 @@ class ModelProfile(BaseModel):
     tool_choice: Literal["named", "required", "auto"] = "named"
     extra_body: dict[str, Any] = Field(default_factory=dict)
     max_tokens: int = 4096
+    # Newer OpenAI reasoning models (gpt-5.x, gpt-6.x) only accept max_completion_tokens and no temperature.
+    token_param: Literal["max_tokens", "max_completion_tokens"] = "max_tokens"
+    temperature: float | None = 0.0  # None = don't send
     timeout_s: float = 90.0
     price_in_per_m: float | None = None
     price_out_per_m: float | None = None

@@ -36,9 +36,10 @@ class OpenAICompatibleClient(LLMClient):
         kwargs: dict = {
             "model": self.profile.model,
             "messages": [{"role": "system", "content": system}, {"role": "user", "content": content}],
-            "max_tokens": self.profile.max_tokens,
-            "temperature": 0,
+            self.profile.token_param: self.profile.max_tokens,
         }
+        if self.profile.temperature is not None:
+            kwargs["temperature"] = self.profile.temperature
         if self.profile.extra_body:
             kwargs["extra_body"] = self.profile.extra_body
         if strategy == "tools":

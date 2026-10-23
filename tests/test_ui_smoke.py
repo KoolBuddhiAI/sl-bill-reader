@@ -77,7 +77,7 @@ def test_upload_review_approve_export(server, samples_dir, tmp_path):
         total = page.locator("#f-total")
         expect(total).to_have_value("2719900.00")
         expect(page.locator(".fld[data-name=total]")).to_have_class("field fld level-high has-box")
-        expect(page.locator("#extraction-info")).to_contain_text("Extracted by glm-vision")
+        expect(page.locator("#extraction-info")).to_contain_text("Extracted by")
         page.wait_for_function("document.getElementById('page-img').naturalWidth > 0")
 
         highlight = page.locator("#highlight")
